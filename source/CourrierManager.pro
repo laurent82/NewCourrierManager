@@ -8,14 +8,17 @@ DESTDIR = ../../build/bin/
 #INCLUDEPATH += include/
 #DEPENDPATH += src \
 #        ui
-HEADERS += CourrierManager.h \
+HEADERS += CView.h \
+    CControler.h \
     CGestion.h \
-    CDrawPanel.h \
-    CFastSearch.h
+    CDrawPanelWidget.h \
+    CFastSearch.h \
+    CError.h
 SOURCES += main.cpp \
-    CourrierManager.cpp \
+    CView.cpp \
+    CControler.cpp \
     CGestion.cpp \
-    CDrawPanel.cpp \
+    CDrawPanelWidget.cpp \
     CFastSearch.cpp
 
 FORMS += courriermanager.ui

@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QProgressDialog>
 
+#include "CError.h"
+
 // Lecture, écriture de fichier
 // A remplacer avec les fonctions Qt ?
 #include <fstream>
@@ -17,9 +19,19 @@ using namespace std;
 
 
 CGestion::CGestion()
+{}
+
+CGestion::~CGestion(){
+    delete m_fileList;
+    delete m_lastPatient;
+    delete m_fileToCopyList;
+}
+
+void CGestion::loadConfigFile()
 {
     // Lecture des paramètres
     ifstream file("config.txt");
+    if (file) {
     string strSearch, strTransfert, strDestination, strBackup, strPDF;
     getline(file, strSearch);
     getline(file, strTransfert);
@@ -35,15 +47,11 @@ CGestion::CGestion()
     m_PDFDir = QString(strPDF.c_str());
     m_lastPatient = new PatientInfo();
     m_sendremaining = 0;
+    }
+    else {
+        emit errorOccur(CError::NOCONFIGFILE);
+    }
 }
-
-CGestion::~CGestion(){
-    delete m_fileList;
-    delete m_lastPatient;
-    delete m_fileToCopyList;
-}
-
-
 
 void CGestion::search(){
     m_fileList->clear();
@@ -100,7 +108,7 @@ void CGestion::getInfo(QString& _name, QString& _surname, QString& _date, int& _
 }
 
 void CGestion::setFastSearch(CFastSearch* _fs){
-    m_fastsearch = _fs;
+   m_fastsearch = _fs;
 }
 
 void CGestion::setLastAdded(QStringList* _la){
@@ -358,4 +366,12 @@ bool CGestion::deleteFile(){
         return true;
     else
         return false;
+}
+
+void CGestion::onBtnSearchClicked()
+{
+    search();
+    QString str;
+    getFile(str);
+    emit setFile(str);
 }

@@ -1,10 +1,10 @@
 #include <QtGui/QApplication>
-#include "courriermanager.h"
+#include "CControler.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    CourrierManager w;
+    CControler w;
     return a.exec();
 }

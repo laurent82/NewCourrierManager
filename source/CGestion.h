@@ -18,11 +18,13 @@ public:
     int page;
 };
 
-class CGestion
+class CGestion : public QObject
 {
+    Q_OBJECT
 public:
     CGestion();
     ~CGestion();
+    void loadConfigFile();
     void search();
     void setInfo(QString, QString, QString, int);
     void getInfo(QString&, QString&, QString&, int&);
@@ -39,6 +41,11 @@ public:
     void setLastAdded(QStringList*);
     void convertPDFall();
 
+public slots:
+    void onBtnSearchClicked();
+signals:
+    void setFile(QString str);
+    void errorOccur(int errorId);
 private:
 
     void constructFileName(QString& f, int type = TYPE_JPG);
