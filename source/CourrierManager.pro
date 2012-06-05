@@ -13,12 +13,14 @@ HEADERS += CView.h \
     CGestion.h \
     CDrawPanelWidget.h \
     CFastSearch.h \
-    CError.h
+    CError.h \
+    CPatient.h
 SOURCES += main.cpp \
     CView.cpp \
     CControler.cpp \
     CGestion.cpp \
     CDrawPanelWidget.cpp \
-    CFastSearch.cpp
+    CFastSearch.cpp \
+    CPatient.cpp
 
 FORMS += courriermanager.ui

@@ -10,22 +10,31 @@
 #include <QCleanlooksStyle>
 
 #include "CError.h"
+#include "CPatient.h"
 
 
 CView::CView(QWidget *parent)
     : QDialog(parent), ui(new Ui::CourrierManagerClass)
 {
+    // Ui
     QApplication::setStyle(new QPlastiqueStyle/*QCleanlooksStyle*/);
     ui->setupUi(this);
     this->setCurrentDate();
     m_panel = new CDrawPanelWidget(0, 0, this);
     this->showMaximized();
+
+    // Ajout des derniers
     m_lastAdded = new QStringList;
     m_lastAddedModel = new QStringListModel(*m_lastAdded);
     ui->tableLast->setModel(m_lastAddedModel);
+
+    // Recherche rapide
     m_fastsearch = new CFastSearch();
     m_modele = new QStringListModel(*m_fastsearch->getCurrentList());
     ui->tablePatient->setModel(m_modele);
+
+    // Dernier patient
+    m_currentPatient = new CPatient();
 /*
     m_gestion = new CGestion();
     m_gestion->setFastSearch(m_fastsearch);
@@ -74,32 +83,30 @@ void CView::displayError(int errorId)
     }
 }
 
-void CView::refreshRemaining(){
-  /*
-    int iRemaining, iSendRemaining;
-    m_gestion->getRemaining(iRemaining, iSendRemaining);
+void CView::onRefreshRemaining(int iRemaining, int iSendRemaining)
+{
     ui->lblRemaining->setText(QString("%1").arg(iRemaining));
     ui->lblSent->setText(QString("%1").arg(iSendRemaining));
-    */
 }
 
-void CView::prepareNext(){
-    /*
+void CView::onPrepareNext(const QString& str)
+{
     resetInfoPatient();
-    QString str;
-    m_gestion->getNextFile(str);
-    if (str.isNull() || str.isEmpty()){
+    //  QString str;
+    //  m_gestion->getNextFile(str);
+    if (str.isNull() || str.isEmpty()) {
         QMessageBox::information(this, tr("Courrier"),
                                  tr("Il n'y a plus de courrier à classer!"),
                                  QMessageBox::Ok);
     }
-    if (!m_panel->setFile(str)){
-        QMessageBox::information(this, tr("Courrier"),
-                                 tr("Une erreur est survenue lors du chargement de l'image."),
-                                 QMessageBox::Ok);
+    else {
+        if (!m_panel->setFile(str)) {
+            QMessageBox::information(this, tr("Courrier"),
+                                     tr("Une erreur est survenue lors du chargement de l'image."),
+                                     QMessageBox::Ok);
+        }
     }
-    refreshRemaining();
-    */
+    //   refreshRemaining();
 }
 
 bool CView::constructDate(QString &_date){
@@ -138,8 +145,6 @@ void CView::resetInfoPatient(){
     m_tableUsed = false;
 }
 
-
-
 void CView::on_btnSearch_clicked()
 {
     emit btnSearchClicked();
@@ -147,7 +152,7 @@ void CView::on_btnSearch_clicked()
 
 void CView::onSetFile(QString str)
 {
-    refreshRemaining();
+    /*refreshRemaining();
     if (!str.isNull()) {
         m_panel->setFile(str);
     }
@@ -156,12 +161,12 @@ void CView::onSetFile(QString str)
                                  tr("Il n'y a plus de courrier à classer!"),
                                  QMessageBox::Ok);
     }
+    */
 }
 
 void CView::on_btnValidate_clicked()
 {
-    emit btnValidateClicked();
-    /*
+    // Récupération des infos des champs.
     QString date;
     if (constructDate(date)){
         if (ui->txtName->text().isEmpty() || ui->txtSurname->text().isEmpty() || ui->txtDay->text().isEmpty()
@@ -171,7 +176,14 @@ void CView::on_btnValidate_clicked()
                                  QMessageBox::Ok);
             return;
         }
-        m_gestion->setInfo(ui->txtName->text().toUpper(), ui->txtSurname->text().toLower(), date, ui->spPage->value());
+        m_currentPatient->clear();
+        m_currentPatient->configure("name", QVariant(ui->txtName->text().toUpper()));
+        m_currentPatient->configure("surname", QVariant(ui->txtSurname->text().toLower()));
+        m_currentPatient->configure("date", QVariant(date));
+        m_currentPatient->configure("page", QVariant(ui->spPage->value()));
+        emit btnValidateClicked(m_currentPatient);
+
+        /*
         if (!m_gestion->renameFile(m_tableUsed)){
             QMessageBox::critical(this, tr("Courrier"),
                                   tr("Une erreur est survenue lors de la gestion de ce courrier. Le courrier a-t'il été recherché?"),
@@ -181,8 +193,8 @@ void CView::on_btnValidate_clicked()
             prepareNext();
             m_lastAddedModel->setStringList(*m_lastAdded);
         }
+        */
     }
-    */
 }
 
 
@@ -286,14 +298,18 @@ void CView::copyCancel() {
 }
 
 void CView::on_btnNext_clicked(){
-    prepareNext();
+    //prepareNext();
 }
 
-void CView::on_btnDelete_clicked(){
-    /*
+void CView::on_btnDelete_clicked()
+{
     int rep = QMessageBox::question(this, tr("Courrier"),
                                     tr("Ce fichier sera supprimé définitivement. Continuer?"),
                                     QMessageBox::Yes|QMessageBox::No);
+    if (rep == QMessageBox::Yes) {
+        emit deleteFile();
+    }
+    /*
     if (rep == QMessageBox::Yes){
         if (m_gestion->deleteFile())
             prepareNext();
@@ -301,8 +317,7 @@ void CView::on_btnDelete_clicked(){
             QMessageBox::warning(this, tr("Courrier"),
                                  tr("Une erreur est survenue lors de la suppression de ce fichier."),
                                  QMessageBox::Ok);
-    }
-    */
+    }*/
 }
 
 void CView::on_btnConvert_clicked(){

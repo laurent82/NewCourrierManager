@@ -27,11 +27,13 @@ public:
     ~CView();
 
 private:
-    void refreshRemaining();
-    void prepareNext();
+  //  void refreshRemaining();
     void resetInfoPatient();
     void setCurrentDate();
     bool constructDate(QString &_date);
+
+    CPatient* m_currentPatient; // Info du dernier patient enregistré.
+
     QStringListModel *m_modele;
     QStringList* m_lastAdded;
     QStringListModel* m_lastAddedModel;
@@ -47,10 +49,13 @@ protected:
 
 public slots:
     void onSetFile(QString);
+    void onRefreshRemaining(int, int);
+    void onPrepareNext(const QString&);
     void displayError(int errorId);
 protected slots:
+    void on_btnValidate_clicked(); // Signal émis lorsque les infos de la page sont validés.
+
     void on_btnSearch_clicked();
-    void on_btnValidate_clicked();
     void on_btnSamePatient_clicked();
     void on_btnToday_clicked();
     void on_btnLastDate_clicked();
@@ -65,8 +70,9 @@ protected slots:
 
 signals:
     void btnSearchClicked();
-    void btnValidateClicked();
+    void btnValidateClicked(CPatient* patient);
     void criticalError();
+    void deleteFile();
 };
 
 #endif // COURRIERMANAGER_H

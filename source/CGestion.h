@@ -5,18 +5,10 @@
 #include <QString>
 
 #include "CFastSearch.h"
+#include "CPatient.h"
 
 #define TYPE_JPG 1
 #define TYPE_PDF 2
-
-class PatientInfo{
-public:
-    PatientInfo(){ name = surname = date = ""; page = 0;}
-    QString name;
-    QString surname;
-    QString date;
-    int page;
-};
 
 class CGestion : public QObject
 {
@@ -29,7 +21,6 @@ public:
     void setInfo(QString, QString, QString, int);
     void getInfo(QString&, QString&, QString&, int&);
     void getDate(QString&);
-    void extractDate(QString, QString&, QString&, QString&);
     void getRemaining(int&, int&);
     bool renameFile(bool tableUsed = false);
      void initCopyFile();
@@ -42,13 +33,36 @@ public:
     void convertPDFall();
 
 public slots:
-    void onBtnSearchClicked();
+    void onSearch();
+
+    void onValidate(CPatient *patient);
+ //   void onDeleteFile();
+
 signals:
     void setFile(QString str);
     void errorOccur(int errorId);
+    void sentRefreshRemaining(int, int);
 private:
+    void prepareNext();
 
-    void constructFileName(QString& f, int type = TYPE_JPG);
+    /**
+     * @brief Construit le nom de fichier en fonction du type désiré.
+     * @param patient Info sur le patient
+     * @param type Type de fichier (jpg ou pdf)
+     * @return Nom du fichier
+     */
+    QString constructFileName(CPatient *patient, int type = TYPE_JPG);
+
+    /**
+     * @brief Extrait la date du QString d'entrée.
+     * @param date (Entrée) Date au format YYYYMMDD
+     * @param day (Sortie) Jour
+     * @param month (Sortie) Mois
+     * @param year (Sortie) Année
+     */
+    void extractDate(const QString& date, QString& day, QString& month, QString& year);
+
+
     bool convertPDF(QString);
     QStringList* m_fileList;
     QStringList* m_fileToCopyList;
@@ -61,7 +75,6 @@ private:
     int m_i;    // Indice de parcours dans le fichier
     int m_ic;   // Indice de parcours des fichiers à copier
     int m_sendremaining;
-    PatientInfo* m_lastPatient;
     CFastSearch* m_fastsearch;
 
 };
