@@ -4,7 +4,6 @@
 #include <QtGui/QDialog>
 #include <QResizeEvent>
 
-#include "CGestion.h"
 #include "CDrawPanelWidget.h"
 #include "CFastSearch.h"
 #include <QStringListModel>
@@ -32,8 +31,6 @@ private:
     void setCurrentDate();
     bool constructDate(QString &_date);
 
-    CPatient* m_currentPatient; // Info du dernier patient enregistrÃ©.
-
     QStringListModel *m_modele;
     QStringList* m_lastAdded;
     QStringListModel* m_lastAddedModel;
@@ -53,9 +50,10 @@ public slots:
     void onPrepareNext(const QString&);
     void displayError(int errorId);
 protected slots:
-    void on_btnValidate_clicked(); // Signal Ã©mis lorsque les infos de la page sont validÃ©s.
+    void on_button_clicked(QString senderName); // Slot activé par un bouton, destiné à envoyer un message au controller.
 
-    void on_btnSearch_clicked();
+    void on_btnValidate_clicked(); // Signal émis lorsque les infos de la page sont validés.
+
     void on_btnSamePatient_clicked();
     void on_btnToday_clicked();
     void on_btnLastDate_clicked();
@@ -69,8 +67,10 @@ protected slots:
     void copyCancel();
 
 signals:
-    void btnSearchClicked();
-    void btnValidateClicked(CPatient* patient);
+    void sendCommand(QString);
+
+    void btnConfigurationClicked();
+    void btnValidateClicked();
     void criticalError();
     void deleteFile();
 };

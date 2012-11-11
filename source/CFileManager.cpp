@@ -1,4 +1,4 @@
-#include "CGestion.h"
+#include "CFileManager.h"
 
 #include <QDir>
 #include <QFileInfoList>
@@ -6,8 +6,10 @@
 #include <QFile>
 #include <QProcess>
 #include <QDebug>
-#include <QProgressDialog>
 #include <QVariant>
+
+#include <QProgressDialog>
+#include <QApplication>
 
 #include "CError.h"
 
@@ -19,15 +21,17 @@ using namespace std;
 
 
 
-CGestion::CGestion()
+CFileManager::CFileManager()
 {}
 
-CGestion::~CGestion(){
+CFileManager::~CFileManager(){
     delete m_fileList;
     delete m_fileToCopyList;
 }
 
-void CGestion::loadConfigFile()
+
+
+void CFileManager::loadConfigFile()
 {
     // Lecture des paramètres
     ifstream file("config.txt");
@@ -52,7 +56,8 @@ void CGestion::loadConfigFile()
     }
 }
 
-void CGestion::onSearch()
+
+void CFileManager::onSearch()
 {
     m_fileList->clear();
     QDir dir(m_searchDir);
@@ -74,124 +79,46 @@ void CGestion::onSearch()
     m_i = 0;
 }
 
-void CGestion::onValidate(CPatient* patient)
+void CFileManager::onValidate()
 {
 
+
 }
 
-/*
-void CGestion::refreshRemaining()
+
+void  CFileManager::convertPDFall()
 {
-    int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() : 0;
-    int iSendRemaining = m_sendremaining;
-    emit sentRefreshRemaining(iRemaining, iSendRemaining);
-}
-*/
-
-void CGestion::getNextFile(QString& _resp){
-    m_i++;
-    getFile(_resp);
-}
-
-void CGestion::getFile(QString& _resp){
-    if (!m_fileList->isEmpty()){
-        if (m_i >= 0 && m_i < m_fileList->size())
-            _resp = m_searchDir + m_fileList->at(m_i);
+    // Récupération de la liste des fichiers à copier
+    QDir dir(m_backupDir);
+    QStringList filters;
+    QStringList* filesToConvert = new QStringList;
+    filters << "*.jpg" << "*.JPG";
+    dir.setNameFilters(filters);
+    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        filesToConvert->append(fileInfo.fileName());
     }
-}
-
-void CGestion::setInfo(QString _name, QString _surname, QString _date, int _page){
-  /*
-    m_lastPatient->name = _name;
-    m_lastPatient->surname = _surname;
-    m_lastPatient->date = _date;
-    m_lastPatient->page = _page;
-    */
-}
-
-void CGestion::getInfo(QString& _name, QString& _surname, QString& _date, int& _page){
-   /*
-    m_lastPatient->page++;
-    _name = m_lastPatient->name;
-    _surname = m_lastPatient->surname;
-    _date = m_lastPatient->date;
-    _page = m_lastPatient->page;
-  */
-}
-
-void CGestion::setFastSearch(CFastSearch* _fs){
-   m_fastsearch = _fs;
-}
-
-void CGestion::setLastAdded(QStringList* _la){
-    m_lastAdded = _la;
-}
-
-void CGestion::getDate(QString& _date){
-    _date = m_lastPatient->date;
-}
-
-QString CGestion::constructFileName(CPatient* patient, int type)
-{
-    QString fileName = QString();
-    switch(type){
-    case TYPE_JPG:
-        fileName = patient->getParameter("data").toString();
-        fileName.append("_");
-        fileName.append(patient->getParameter("name").toString());
-        fileName.append("_");
-        fileName.append(patient->getParameter("surname").toString());
-        fileName.append("_");
-        fileName.append(patient->getParameter("page").toString());
-        fileName.append(".jpg");
-        break;
-    case TYPE_PDF:
-        fileName = patient->getParameter("name").toString();
-        fileName.append("_");
-        fileName.append(patient->getParameter("surname").toString().toUpper());
-        fileName.append("_$_");
-        // Conversion de la date au format JJMMAAAA
-        QString day, month, year;
-        extractDate(patient->getParameter("date").toString(), day, month, year);
-        fileName.append(day);
-        fileName.append(month);
-        fileName.append(year);
-        fileName.append("_RESUMECONTACT.pdf");
+    QProgressDialog pd ("Conversion en cours...", "Annuler", 0, filesToConvert->size(), qApp->activeWindow(), Qt::Dialog);
+    pd.setAutoClose(false);
+    for (int i = 0; i < filesToConvert->size(); ++i){
+        // Extraction des données depuis le nom de fichier
+        pd.setValue(i);
+        QString currentFile = filesToConvert->at(i);
+        CPatient::instance()->configure("patient_date", currentFile.section('_',0,0));
+        CPatient::instance()->configure("patient_name", currentFile.section('_',1,1));
+        CPatient::instance()->configure("patient_surname", currentFile.section('_',2,2));
+        convertPDF(QString(m_backupDir + currentFile));
     }
-    return fileName;
+    delete filesToConvert;
 }
 
-void CGestion::extractDate(const QString &date, QString& day, QString& month, QString& year){
-    QChar c;
-    QString var = "";
-
-    // Récupère l'année
-    for (int i = 0; i < 4; ++i){
-        c = date.at(i);
-        var.append(c);
-    }
-    year = var;
-    // Récupère le mois
-    var.clear();
-    c = date.at(4);
-    var.append(c);
-    c = date.at(5);
-    var.append(c);
-    month = var;
-    // Récupère le jour
-    var.clear();
-    c = date.at(6);
-    var.append(c);
-    c = date.at(7);
-    var.append(c);
-    day = var;
-}
-
-bool CGestion::convertPDF(QString _backupFileName){
+bool CFileManager::convertPDF(QString _backupFileName){
     // Création du nouveau nom
-    QString strFileNamePDF;
+    QString strFileNamePDF = constructFileName(TYPE_PDF);
     QString strTransferNamePDF;
-    constructFileName(strFileNamePDF, TYPE_PDF);
+
     strTransferNamePDF = m_transferDir + strFileNamePDF;
     strFileNamePDF.prepend(m_PDFDir);
     if (!QFile::exists( strFileNamePDF)){
@@ -227,39 +154,9 @@ bool CGestion::convertPDF(QString _backupFileName){
     return true;
 }
 
-void CGestion::convertPDFall(){
-
-    // Récupération de la liste des fichiers à copier
-    QDir dir(m_backupDir);
-    QStringList filters;
-    QStringList* filesToConvert = new QStringList;
-    filters << "*.jpg" << "*.JPG";
-    dir.setNameFilters(filters);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    QFileInfoList list = dir.entryInfoList();
-    for (int i = 0; i < list.size(); ++i) {
-        QFileInfo fileInfo = list.at(i);
-        filesToConvert->append(fileInfo.fileName());
-    }
-    QProgressDialog pd ("Conversion en cours...", "Annuler", 0, filesToConvert->size());
-    pd.setAutoClose(false);
-    for (int i = 0; i < filesToConvert->size(); ++i){
-        // Extraction des données depuis le nom de fichier
-        pd.setValue(i);
-        QString currentFile = filesToConvert->at(i);
-        m_lastPatient->date = currentFile.section('_',0,0);
-        m_lastPatient->name = currentFile.section('_',1,1);
-        m_lastPatient->surname = currentFile.section('_',2,2);
-        convertPDF(QString(m_backupDir + currentFile));
-    }
-    delete filesToConvert;
-}
-
-
-
-bool CGestion::renameFile(CPatient* patient, QFile* file, bool _tableUsed)
+bool CFileManager::renameFile(QFile* file, bool _tableUsed)
 {
-    QString strFileName = constructFileName(patient);
+    QString strFileName = constructFileName(TYPE_JPG);
     QString backupFileName = strFileName;
 
     // Ajout des répertoires:
@@ -269,20 +166,136 @@ bool CGestion::renameFile(CPatient* patient, QFile* file, bool _tableUsed)
     // Vérification du nom de fichier dans le cas où il
     // existerait déjà (erreur d'encodage, reprise...). Modifie le nom sinon.
     while (QFile::exists(strFileName) || QFile::exists(backupFileName)) {
-        patient->incrementPage();
+        CPatient::instance()->incrementPage();
         strFileName.clear();
-        strFileName = constructFileName(patient);
+        strFileName = constructFileName(TYPE_JPG);
         backupFileName = strFileName;
         strFileName.prepend(m_transferDir);
         backupFileName.prepend(m_backupDir);
     }
 
     // Copie du fichier de backup et suppression de l'original.
-    if ( !(file.copy(backupFileName)) ||
-         !(file.remove()) ) {
+    if ( !(file->copy(backupFileName)) ||
+         !(file->remove()) ) {
         return false;
     }
+    return true;
 }
+
+QString CFileManager::constructFileName(int type)
+{
+    QString fileName = QString();
+    CPatient* patient = CPatient::instance();
+    switch(type){
+    case TYPE_JPG:
+        fileName = patient->getParameter("data").toString();
+        fileName.append("_");
+        fileName.append(patient->getParameter("name").toString());
+        fileName.append("_");
+        fileName.append(patient->getParameter("surname").toString());
+        fileName.append("_");
+        fileName.append(patient->getParameter("page").toString());
+        fileName.append(".jpg");
+        break;
+    case TYPE_PDF:
+        fileName = patient->getParameter("name").toString();
+        fileName.append("_");
+        fileName.append(patient->getParameter("surname").toString().toUpper());
+        fileName.append("_$_");
+        // Conversion de la date au format JJMMAAAA
+        QString day, month, year;
+        extractDate(patient->getParameter("date").toString(), day, month, year);
+        fileName.append(day);
+        fileName.append(month);
+        fileName.append(year);
+        fileName.append("_RESUMECONTACT.pdf");
+    }
+    return fileName;
+}
+
+/*
+void CFileManager::refreshRemaining()
+{
+    int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() : 0;
+    int iSendRemaining = m_sendremaining;
+    emit sentRefreshRemaining(iRemaining, iSendRemaining);
+}
+*/
+
+void CFileManager::getNextFile(QString& _resp){
+    m_i++;
+    getFile(_resp);
+}
+
+void CFileManager::getFile(QString& _resp){
+    if (!m_fileList->isEmpty()){
+        if (m_i >= 0 && m_i < m_fileList->size())
+            _resp = m_searchDir + m_fileList->at(m_i);
+    }
+}
+
+void CFileManager::setInfo(QString _name, QString _surname, QString _date, int _page){
+  /*
+    m_lastPatient->name = _name;
+    m_lastPatient->surname = _surname;
+    m_lastPatient->date = _date;
+    m_lastPatient->page = _page;
+    */
+}
+
+void CFileManager::getInfo(QString& _name, QString& _surname, QString& _date, int& _page){
+   /*
+    m_lastPatient->page++;
+    _name = m_lastPatient->name;
+    _surname = m_lastPatient->surname;
+    _date = m_lastPatient->date;
+    _page = m_lastPatient->page;
+  */
+}
+
+void CFileManager::setFastSearch(CFastSearch* _fs){
+   m_fastsearch = _fs;
+}
+
+void CFileManager::setLastAdded(QStringList* _la){
+    m_lastAdded = _la;
+}
+
+void CFileManager::getDate(QString& _date){
+    //_date = m_lastPatient->date;
+}
+
+
+
+void CFileManager::extractDate(const QString &date, QString& day, QString& month, QString& year){
+    QChar c;
+    QString var = "";
+
+    // Récupère l'année
+    for (int i = 0; i < 4; ++i){
+        c = date.at(i);
+        var.append(c);
+    }
+    year = var;
+    // Récupère le mois
+    var.clear();
+    c = date.at(4);
+    var.append(c);
+    c = date.at(5);
+    var.append(c);
+    month = var;
+    // Récupère le jour
+    var.clear();
+    c = date.at(6);
+    var.append(c);
+    c = date.at(7);
+    var.append(c);
+    day = var;
+}
+
+
+
+
 
 
 
@@ -347,9 +360,9 @@ bool CGestion::renameFile(CPatient* patient, QFile* file, bool _tableUsed)
 //    }
 //    else
 //        return false;
-}
+//}
 
-void CGestion::initCopyFile(){
+void CFileManager::initCopyFile(){
     m_fileToCopyList = new QStringList;
     QDir dir(m_transferDir);
     QStringList filters;
@@ -365,7 +378,7 @@ void CGestion::initCopyFile(){
     m_ic = 0;
 }
 
-bool CGestion::copyNextFile(){
+bool CFileManager::copyNextFile(){
     if (!m_fileToCopyList)
         initCopyFile();
     if (m_ic >= 0 && m_ic < m_fileToCopyList->size()){
@@ -382,7 +395,7 @@ bool CGestion::copyNextFile(){
         return false;
 }
 
-void CGestion::prepareNext()
+void CFileManager::prepareNext()
 {
     QString str;
     this->getNextFile(str);
@@ -391,7 +404,7 @@ void CGestion::prepareNext()
 }
 
 /*
-void CGestion::onBtnSearchClicked()
+void CFileManager::onBtnSearchClicked()
 {
     search();
     QString str;
@@ -400,7 +413,7 @@ void CGestion::onBtnSearchClicked()
     refreshRemaining();
 }
 
-void CGestion::onDeleteFile()
+void CFileManager::onDeleteFile()
 {
     QString strFileToOpen;
     getFile(strFileToOpen);

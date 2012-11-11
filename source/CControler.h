@@ -2,7 +2,7 @@
 #define CCONTROLER_H
 
 class CView;
-class CGestion;
+class CFileManager;
 
 #include <QObject>
 
@@ -12,11 +12,15 @@ class CControler : public QObject
 public:
     CControler();
 
+
 public slots:
+    void onError(int errorId);
     void onCriticalError();
+
+    void showConfigDialog();
 
 private:
     CView* m_view;
-    CGestion* m_gestion;
+    CFileManager* m_fileManager;
 };
     #endif

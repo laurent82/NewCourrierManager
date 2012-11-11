@@ -1,8 +1,19 @@
 #include "CPatient.h"
 
+CPatient* CPatient::m_instance = 0;
+
 CPatient::CPatient()
 {
 }
+
+CPatient* CPatient::instance()
+{
+    if (!m_instance){
+        m_instance = new CPatient();
+    }
+    return m_instance;
+}
+
 
 void CPatient::configure(const QString &key, const QVariant &value)
 {

@@ -10,17 +10,19 @@ DESTDIR = ../../build/bin/
 #        ui
 HEADERS += CView.h \
     CControler.h \
-    CGestion.h \
     CDrawPanelWidget.h \
     CFastSearch.h \
     CError.h \
-    CPatient.h
+    CPatient.h \
+    CFileManager.h \
+    CConfigFrame.h
 SOURCES += main.cpp \
     CView.cpp \
     CControler.cpp \
-    CGestion.cpp \
     CDrawPanelWidget.cpp \
     CFastSearch.cpp \
-    CPatient.cpp
+    CPatient.cpp \
+    CFileManager.cpp \
+    CConfigFrame.cpp
 
 FORMS += courriermanager.ui

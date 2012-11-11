@@ -33,8 +33,6 @@ CView::CView(QWidget *parent)
     m_modele = new QStringListModel(*m_fastsearch->getCurrentList());
     ui->tablePatient->setModel(m_modele);
 
-    // Dernier patient
-    m_currentPatient = new CPatient();
 /*
     m_gestion = new CGestion();
     m_gestion->setFastSearch(m_fastsearch);
@@ -44,9 +42,15 @@ CView::CView(QWidget *parent)
    // ui->btnSend->setVisible(false);
     ui->btnConvert->setVisible(false);
 
-
     m_tableUsed = false;
 
+    ui->btnSearch->setProperty("commandName", "search");
+    ui->btnDelete->setProperty("commandName", "delete");
+
+    connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
+    connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(on_button_clicked(QString)));
+    // Ajoute la date de la compilation
+    ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
 
 
@@ -145,9 +149,10 @@ void CView::resetInfoPatient(){
     m_tableUsed = false;
 }
 
-void CView::on_btnSearch_clicked()
+void CView::on_button_clicked(QString senderName)
 {
-    emit btnSearchClicked();
+    QString name = sender()->property("commandName").toString();
+    emit sendCommand(name);
 }
 
 void CView::onSetFile(QString str)
@@ -176,12 +181,12 @@ void CView::on_btnValidate_clicked()
                                  QMessageBox::Ok);
             return;
         }
-        m_currentPatient->clear();
-        m_currentPatient->configure("name", QVariant(ui->txtName->text().toUpper()));
-        m_currentPatient->configure("surname", QVariant(ui->txtSurname->text().toLower()));
-        m_currentPatient->configure("date", QVariant(date));
-        m_currentPatient->configure("page", QVariant(ui->spPage->value()));
-        emit btnValidateClicked(m_currentPatient);
+        CPatient::instance()->clear();
+        CPatient::instance()->configure("patient_name", QVariant(ui->txtName->text().toUpper()));
+        CPatient::instance()->configure("patient_surname", QVariant(ui->txtSurname->text().toLower()));
+        CPatient::instance()->configure("patient_date", QVariant(date));
+        CPatient::instance()->configure("patient_page", QVariant(ui->spPage->value()));
+        emit btnValidateClicked();
 
         /*
         if (!m_gestion->renameFile(m_tableUsed)){
