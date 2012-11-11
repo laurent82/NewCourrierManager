@@ -48,7 +48,7 @@ CView::CView(QWidget *parent)
     ui->btnDelete->setProperty("commandName", "delete");
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
-    connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(on_button_clicked(QString)));
+    connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(on_button_clicked()));
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
@@ -149,7 +149,7 @@ void CView::resetInfoPatient(){
     m_tableUsed = false;
 }
 
-void CView::on_button_clicked(QString senderName)
+void CView::on_button_clicked()
 {
     QString name = sender()->property("commandName").toString();
     emit sendCommand(name);

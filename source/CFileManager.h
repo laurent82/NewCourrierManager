@@ -75,7 +75,8 @@ public:
     void setLastAdded(QStringList*);
 
 public slots:
-    void onSearch();
+    void onCommandReceived(QString command);
+
 
     void onValidate();
  //   void onDeleteFile();

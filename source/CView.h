@@ -50,7 +50,7 @@ public slots:
     void onPrepareNext(const QString&);
     void displayError(int errorId);
 protected slots:
-    void on_button_clicked(QString senderName); // Slot activé par un bouton, destiné à envoyer un message au controller.
+    void on_button_clicked(); // Slot activé par un bouton, destiné à envoyer un message au controller.
 
     void on_btnValidate_clicked(); // Signal émis lorsque les infos de la page sont validés.
 

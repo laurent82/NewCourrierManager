@@ -56,9 +56,20 @@ void CFileManager::loadConfigFile()
     }
 }
 
-
-void CFileManager::onSearch()
+void CFileManager::onCommandReceived(QString command)
 {
+    if (command.compare("search") == 0) {
+        search();
+//        QString str;
+//        getFile(str);
+//        emit setFile(str);
+//        refreshRemaining();
+    }
+}
+
+void CFileManager::search()
+{
+    // Recherche des fichiers JPG à traiter.
     m_fileList->clear();
     QDir dir(m_searchDir);
     QStringList filters;
@@ -70,6 +81,8 @@ void CFileManager::onSearch()
         QFileInfo fileInfo = list.at(i);
         m_fileList->append(fileInfo.fileName());
     }
+
+    // Recherche des fichiers PDF à envoyer.
     dir = QDir(m_transferDir);
     QStringList pdfFilters;
     pdfFilters << "*.pdf" << "*.PDF";
