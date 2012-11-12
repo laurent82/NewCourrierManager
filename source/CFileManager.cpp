@@ -63,7 +63,7 @@ void CFileManager::onCommandReceived(QString command)
 //        QString str;
 //        getFile(str);
 //        emit setFile(str);
-//        refreshRemaining();
+        refreshRemaining();
     }
 }
 
@@ -81,6 +81,7 @@ void CFileManager::search()
         QFileInfo fileInfo = list.at(i);
         m_fileList->append(fileInfo.fileName());
     }
+    qDebug() << "Fichier JPG trouvé dans " << dir.absolutePath() << ": " << m_fileList->size();
 
     // Recherche des fichiers PDF à envoyer.
     dir = QDir(m_transferDir);
@@ -92,11 +93,6 @@ void CFileManager::search()
     m_i = 0;
 }
 
-void CFileManager::onValidate()
-{
-
-
-}
 
 
 void  CFileManager::convertPDFall()
@@ -226,14 +222,15 @@ QString CFileManager::constructFileName(int type)
     return fileName;
 }
 
-/*
+
 void CFileManager::refreshRemaining()
 {
     int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() : 0;
     int iSendRemaining = m_sendremaining;
-    emit sentRefreshRemaining(iRemaining, iSendRemaining);
+    emit sendInfo("remainingImage", QVariant(iRemaining));
+    emit sendInfo("remainingPDF", QVariant(iSendRemaining));
 }
-*/
+
 
 void CFileManager::getNextFile(QString& _resp){
     m_i++;

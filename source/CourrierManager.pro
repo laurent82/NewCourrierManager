@@ -1,9 +1,9 @@
 TARGET = NewCourrierManager
 TEMPLATE = app
 CONFIG += qt
-MOC_DIR += ../build/moc/
-UI_DIR = ../build/ui
-OBJECTS_DIR = ../build/obj/
+MOC_DIR += ../../build/moc/
+UI_DIR = ../../build/ui
+OBJECTS_DIR = ../../build/obj/
 DESTDIR = ../../build/bin/
 #INCLUDEPATH += include/
 #DEPENDPATH += src \

@@ -77,15 +77,14 @@ public:
 public slots:
     void onCommandReceived(QString command);
 
-
-    void onValidate();
  //   void onDeleteFile();
 
 signals:
     void setFile(QString str);
     void errorOccur(int errorId);
-    void sentRefreshRemaining(int, int);
+    void sendInfo(QString key,  QVariant value);
 private:
+    void refreshRemaining();
 
     void prepareNext();
 

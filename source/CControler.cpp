@@ -14,6 +14,7 @@ CControler::CControler() : QObject()
     //connect(m_view, SIGNAL(btnValidateClicked()), m_fileManager, SLOT(onValidate()));
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
+    connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), m_view, SLOT(onInfoReceived(QString, QVariant)));
     // Gestion des erreurs:
     connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
 
