@@ -8,6 +8,7 @@ DESTDIR = ../../build/bin/
 #INCLUDEPATH += include/
 #DEPENDPATH += src \
 #        ui
+RC_FILE = mainRes.rc
 HEADERS += CView.h \
     CControler.h \
     CDrawPanelWidget.h \

@@ -7,7 +7,10 @@ public:
     CError(){}
     enum Error{
         NOCONFIGFILE,
-        UNKNOWNDIR
+        UNKNOWNDIR,
+        NOPATIENT,
+        INVALIDDATE,
+        EMPTYFIELD
     };
 };
 

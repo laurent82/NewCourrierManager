@@ -229,23 +229,26 @@ QString CFileManager::constructFileName(int type)
     CPatient* patient = CPatient::instance();
     switch(type){
     case TYPE_JPG:
-        fileName = patient->getParameter("data").toString();
+        fileName = patient->getParameter("patient_date").toString();
         fileName.append("_");
-        fileName.append(patient->getParameter("name").toString());
+        fileName.append(patient->getParameter("patient_name").toString());
         fileName.append("_");
-        fileName.append(patient->getParameter("surname").toString());
+        fileName.append(patient->getParameter("patient_surname").toString());
         fileName.append("_");
-        fileName.append(patient->getParameter("page").toString());
+        fileName.append(patient->getParameter("patient_page").toString());
         fileName.append(".jpg");
         break;
     case TYPE_PDF:
-        fileName = patient->getParameter("name").toString();
+        fileName = patient->getParameter("patient_name").toString();
         fileName.append("_");
-        fileName.append(patient->getParameter("surname").toString().toUpper());
+        fileName.append(patient->getParameter("patient_surname").toString().toUpper());
         fileName.append("_$_");
         // Conversion de la date au format JJMMAAAA
         QString day, month, year;
-        extractDate(patient->getParameter("date").toString(), day, month, year);
+
+        // FIXME
+        //extractDate(patient->getParameter("date").toString(), day, month, year);
+
         fileName.append(day);
         fileName.append(month);
         fileName.append(year);
@@ -308,40 +311,6 @@ void CFileManager::setLastAdded(QStringList* _la){
 void CFileManager::getDate(QString& _date){
     //_date = m_lastPatient->date;
 }
-
-
-
-void CFileManager::extractDate(const QString &date, QString& day, QString& month, QString& year){
-    QChar c;
-    QString var = "";
-
-    // Récupère l'année
-    for (int i = 0; i < 4; ++i){
-        c = date.at(i);
-        var.append(c);
-    }
-    year = var;
-    // Récupère le mois
-    var.clear();
-    c = date.at(4);
-    var.append(c);
-    c = date.at(5);
-    var.append(c);
-    month = var;
-    // Récupère le jour
-    var.clear();
-    c = date.at(6);
-    var.append(c);
-    c = date.at(7);
-    var.append(c);
-    day = var;
-}
-
-
-
-
-
-
 
 //    // Ouverture du fichier
 //    if (m_fileList->size()){

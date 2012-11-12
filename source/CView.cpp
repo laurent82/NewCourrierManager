@@ -46,9 +46,11 @@ CView::CView(QWidget *parent)
 
     ui->btnSearch->setProperty("commandName", "search");
     ui->btnDelete->setProperty("commandName", "delete");
+    ui->btnValidate->setProperty("commandName", "validate");
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnValidate, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
@@ -104,6 +106,22 @@ void CView::displayError(int errorId)
                              tr("Les répertoires sont incorrects. Utilisez l'option de configuration."),
                              QMessageBox::Ok);
     break;
+
+    case CError::NOPATIENT:
+    QMessageBox::warning(this, tr("Courrier"),
+                             tr("Aucun patient n'a été validé jusqu'à présent."),
+                             QMessageBox::Ok);
+    break;
+    case CError::INVALIDDATE:
+    QMessageBox::warning(this, tr("Courrier"),
+                             tr("Date invalide. Impossible de retrouver la date."),
+                             QMessageBox::Ok);
+    break;
+    case CError::EMPTYFIELD:
+    QMessageBox::critical(this, tr("Courrier"),
+                             tr("Un champ est vide..."),
+                             QMessageBox::Ok);
+    break;
     }
 }
 
@@ -114,9 +132,7 @@ bool CView::constructDate(QString &_date){
     int iMonth = ui->txtMonth->text().toInt();
     int iYear = ui->txtYear->text().toInt();
     if (iDay < 1 || iDay > 31 || iMonth < 1 || iMonth > 12 || iYear < 1950 ){
-        QMessageBox::warning(this, tr("Courrier"),
-                             tr("La date n'a pas un format correct."),
-                             QMessageBox::Ok);
+        displayError(CError::INVALIDDATE);
         return false;
     }
     _date = ui->txtYear->text();
@@ -136,7 +152,35 @@ void CView::setCurrentDate(){
     ui->txtYear->setText(QString("%1").arg(date.year()));
 }
 
-void CView::resetInfoPatient(){
+void CView::extractDate(const QString &date, QString& day, QString& month, QString& year)
+{
+    QChar c;
+    QString var = "";
+
+    // Récupère l'année
+    for (int i = 0; i < 4; ++i){
+        c = date.at(i);
+        var.append(c);
+    }
+    year = var;
+    // Récupère le mois
+    var.clear();
+    c = date.at(4);
+    var.append(c);
+    c = date.at(5);
+    var.append(c);
+    month = var;
+    // Récupère le jour
+    var.clear();
+    c = date.at(6);
+    var.append(c);
+    c = date.at(7);
+    var.append(c);
+    day = var;
+}
+
+void CView::resetInfoPatient()
+{
     ui->txtName->clear();
     ui->txtSurname->clear();
     // Date du jour
@@ -145,10 +189,74 @@ void CView::resetInfoPatient(){
     m_tableUsed = false;
 }
 
+bool CView::checkFields()
+{
+    if ( ui->txtName->text().isEmpty() ||
+         ui->txtSurname->text().isEmpty() ||
+         ui->txtDay->text().isEmpty() ||
+         ui->txtMonth->text().isEmpty() ||
+         ui->txtYear->text().isEmpty()
+         ) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 void CView::onButtonClicked()
 {
     QString name = sender()->property("commandName").toString();
+
+    // Cas du bouton Valider
+    if (name.compare("validate") == 0) {
+        if (!checkFields()) {
+            displayError(CError::EMPTYFIELD);
+            return;
+        }
+    }
+
     emit sendCommand(name);
+}
+
+void CView::on_btnToday_clicked(){
+    setCurrentDate();
+}
+
+void CView::on_btnLastDate_clicked()
+{
+    QString day, month, year;
+    if (!m_lastDate.isEmpty()){
+        extractDate(m_lastDate, day, month, year);
+        ui->txtYear->setText(year);
+        ui->txtMonth->setText(month);
+        ui->txtDay->setText(day);
+    }
+    else{
+        setCurrentDate();
+    }
+}
+
+void CView::on_btnSamePatient_clicked()
+{
+    QString name, surname, date;
+    QString day, month, year;
+    int page;
+
+    name = CPatient::instance()->getParameter("patient_name").toString();
+    surname = CPatient::instance()->getParameter("patient_surname").toString();
+    date = CPatient::instance()->getParameter("patient_date").toString();
+    page = CPatient::instance()->getParameter("patient_page").toInt();
+    if (name.isEmpty() && date.isEmpty()){
+        displayError(CError::NOPATIENT);
+        return;
+    }
+    ui->txtName->setText(name);
+    ui->txtSurname->setText(surname);
+    extractDate(date, day, month, year);
+    ui->txtYear->setText(year);
+    ui->txtMonth->setText(month);
+    ui->txtDay->setText(day);
+    ui->spPage->setValue(page);
 }
 
 //void CView::onRefreshRemaining(int iRemaining, int iSendRemaining)
@@ -226,45 +334,11 @@ void CView::onButtonClicked()
 //}
 
 
-//void CView::on_btnSamePatient_clicked(){
-//    /*
-//    QString name, surname, date;
-//    QString day, month, year;
-//    int page;
-//    m_gestion->getInfo(name, surname, date, page);
-//    if (name.isEmpty() && date.isEmpty()){
-//        // TODO : Msg erreur, pas encore eu de patient
-//        return;
-//    }
-//    ui->txtName->setText(name);
-//    ui->txtSurname->setText(surname);
-//    m_gestion->extractDate(date, day, month, year);
-//    ui->txtYear->setText(year);
-//    ui->txtMonth->setText(month);
-//    ui->txtDay->setText(day);
-//    ui->spPage->setValue(page);
-//    */
-//}
 
-//void CView::on_btnToday_clicked(){
-//    setCurrentDate();
-//}
 
-//void CView::on_btnLastDate_clicked(){
-//    /*
-//    QString date, day, month, year;
-//    m_gestion->getDate(date);
-//    if (!date.isEmpty()){
-//        m_gestion->extractDate(date, day, month, year);
-//        ui->txtYear->setText(year);
-//        ui->txtMonth->setText(month);
-//        ui->txtDay->setText(day);
-//    }
-//    else{
-//        setCurrentDate();
-//    }
-//    */
-//}
+
+
+
 
 //void CView::on_txtName_textEdited(QString _txt){
 //    if (ui->cbFastSearch->isChecked()){

@@ -87,19 +87,9 @@ private:
 
     QString getNextFile();
 
-
     void refreshRemaining();
 
     void prepareNext();
-
-    /**
-     * @brief Extrait la date du QString d'entrée.
-     * @param date (Entrée) Date au format YYYYMMDD
-     * @param day (Sortie) Jour
-     * @param month (Sortie) Mois
-     * @param year (Sortie) Année
-     */
-    void extractDate(const QString& date, QString& day, QString& month, QString& year);
 
     bool convertPDF(QString);
 
