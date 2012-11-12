@@ -20,52 +20,50 @@ void CDrawPanelWidget::setPanelSize (int _w, int _h){
     m_width = _w;
     m_height = _h;
     this->setGeometry(15,10, m_width, m_height);
-    if (!m_fileToDraw.isNull()){
-        m_fileToShow = m_fileToDraw.scaledToHeight(m_height);
-        repaint();
+    if (!m_image.isNull()){
+        m_imageScaled = m_image.scaledToHeight(m_height);
+        update();
     }
 }
 
-bool CDrawPanelWidget::setFile(QString strFileName){
-    if (!strFileName.isNull() && !strFileName.isEmpty()){
-        if(m_fileToDraw.load(strFileName)){
-            m_fileToShow = m_fileToDraw.scaledToHeight(m_height);
-            m_drawImage = true;
-        }
-        else{
-            m_drawImage = false;
-            repaint();
-            return false;
-        }
-    }
-    else
+bool CDrawPanelWidget::setImage(const QImage& image)
+{
+    qDebug() << "Setting image";
+    if (!image.isNull()) {
+        m_image = image;
+        m_imageScaled = m_image.scaledToHeight(m_height);
+        m_drawImage = true;
+    } else {
+        qDebug() << "Image is null";
         m_drawImage = false;
-    m_drawZoom = false;
-    repaint();
+        m_drawZoom = false;
+    }
+    update();
     return true;
 }
 
-void CDrawPanelWidget::paintEvent(QPaintEvent *event){
+void CDrawPanelWidget::paintEvent(QPaintEvent *event)
+{
     QPixmap buffer(m_width, m_height);
     QPainter painter(&buffer);
     painter.fillRect(0,0,m_width,m_height, Qt::white);
     if (m_drawImage)
-        painter.drawPixmap(0,0, m_fileToShow);
+        painter.drawImage(0, 0, m_imageScaled);
     if (m_drawZoom)
         drawZoom(&painter);
     QPainter final(this);
     final.drawPixmap(0,0, buffer);
 }
 
-void CDrawPanelWidget::drawZoom(QPainter* painter){
-
+void CDrawPanelWidget::drawZoom(QPainter* painter)
+{
     float rx, ry;
     rx = (float)m_zx/(float)m_width;
     ry = (float)m_zy/(float)m_height;
-    int iX = (int)(rx*m_fileToDraw.width());
-    int iY = (int)(ry*m_fileToDraw.height());
-    m_zoom = m_fileToDraw.copy(iX-100, iY-50, 200, 100);
-    painter->drawPixmap(m_zx, m_zy, m_zoom);
+    int iX = (int)(rx*m_image.width());
+    int iY = (int)(ry*m_image.height());
+    m_zoom = m_image.copy(iX-100, iY-50, 200, 100);
+    painter->drawImage(m_zx, m_zy, m_zoom);
 }
 
 void CDrawPanelWidget::mouseMoveEvent( QMouseEvent * event ){
@@ -77,9 +75,7 @@ void CDrawPanelWidget::mouseMoveEvent( QMouseEvent * event ){
             m_drawZoom = false;
         update();
     }
-    //    qDebug() << "Hello World";
 }
 
 void CDrawPanelWidget::mousePressEvent( QMouseEvent * event ){
-    // if (m_drawZoomMove
 }

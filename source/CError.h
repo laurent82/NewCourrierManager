@@ -6,7 +6,8 @@ class CError
 public:
     CError(){}
     enum Error{
-        NOCONFIGFILE
+        NOCONFIGFILE,
+        UNKNOWNDIR
     };
 };
 

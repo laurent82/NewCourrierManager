@@ -37,8 +37,6 @@ public:
       */
     void search();
 
-    void getNextFile(QString&);
-
     void getRemaining(int&, int&);
 
     bool deleteFile();
@@ -70,7 +68,6 @@ public:
     void getInfo(QString&, QString&, QString&, int&);
     void getDate(QString&);
 
-    void getFile(QString&);
     void setFastSearch(CFastSearch*);
     void setLastAdded(QStringList*);
 
@@ -80,10 +77,17 @@ public slots:
  //   void onDeleteFile();
 
 signals:
-    void setFile(QString str);
     void errorOccur(int errorId);
     void sendInfo(QString key,  QVariant value);
+
 private:
+    bool checkDir();
+
+    QString getFile();
+
+    QString getNextFile();
+
+
     void refreshRemaining();
 
     void prepareNext();

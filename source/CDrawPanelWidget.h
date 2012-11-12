@@ -18,13 +18,13 @@ class CDrawPanelWidget : public QFrame
 public:
     CDrawPanelWidget(int , int , QWidget*);
     void setPanelSize(int, int);
-    bool setFile(QString);
+    bool setImage(const QImage& image);
 private:
     int m_width;
     int m_height;
-    QPixmap m_fileToDraw;
-    QPixmap m_fileToShow;
-    QPixmap m_zoom;
+    QImage m_image;
+    QImage m_imageScaled;
+    QImage m_zoom;
    void mousePressEvent( QMouseEvent * event );
  //   void mouseReleaseEvent( QMouseEvent * event );
     void mouseMoveEvent( QMouseEvent * event );

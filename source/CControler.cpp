@@ -37,12 +37,14 @@ CControler::CControler() : QObject()
 
 void CControler::onError(int errorId)
 {
-    qDebug() << "Error number : " << errorId;
     switch(errorId) {
         case CError::NOCONFIGFILE:
             showConfigDialog();
         break;
+    default:
+        m_view->displayError(errorId);
     }
+
 }
 void CControler::onCriticalError()
 {

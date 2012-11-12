@@ -56,19 +56,51 @@ void CFileManager::loadConfigFile()
     }
 }
 
+bool CFileManager::checkDir()
+{
+    if ( m_searchDir.isEmpty() ||
+         m_transferDir.isEmpty() ||
+         m_destinationDir.isEmpty() ||
+         m_backupDir.isEmpty() ||
+         m_PDFDir.isEmpty()) {
+        return false;
+    }
+
+    QDir dirSearch(m_searchDir);
+    QDir dirTransfer(m_transferDir);
+    QDir dirDestination(m_destinationDir);
+    QDir dirBackup(m_backupDir);
+    QDir dirPDF(m_PDFDir);
+    if ( !dirSearch.exists() ||
+         !dirTransfer.exists() ||
+         !dirDestination.exists() ||
+         !dirBackup.exists() ||
+         !dirPDF.exists()) {
+        return false;
+    }
+
+    return true;
+}
 void CFileManager::onCommandReceived(QString command)
 {
     if (command.compare("search") == 0) {
         search();
-//        QString str;
-//        getFile(str);
-//        emit setFile(str);
         refreshRemaining();
+
+        // Envoi de la prochaine image.
+        QString fileToLoad = getFile();
+        qDebug() << "Loading file :" << fileToLoad;
+        QImage image = QImage(fileToLoad);
+        emit sendInfo("image", QVariant::fromValue<QImage>(image));
     }
 }
 
 void CFileManager::search()
 {
+    if (checkDir() == false) {
+        emit errorOccur(CError::UNKNOWNDIR);
+        return;
+    }
     // Recherche des fichiers JPG à traiter.
     m_fileList->clear();
     QDir dir(m_searchDir);
@@ -232,16 +264,18 @@ void CFileManager::refreshRemaining()
 }
 
 
-void CFileManager::getNextFile(QString& _resp){
+QString CFileManager::getNextFile(){
     m_i++;
-    getFile(_resp);
+    return getFile();
 }
 
-void CFileManager::getFile(QString& _resp){
+QString CFileManager::getFile(){
+    QString resp;
     if (!m_fileList->isEmpty()){
         if (m_i >= 0 && m_i < m_fileList->size())
-            _resp = m_searchDir + m_fileList->at(m_i);
+            resp = m_searchDir + "/" + m_fileList->at(m_i);
     }
+    return resp;
 }
 
 void CFileManager::setInfo(QString _name, QString _surname, QString _date, int _page){
@@ -407,10 +441,9 @@ bool CFileManager::copyNextFile(){
 
 void CFileManager::prepareNext()
 {
-    QString str;
-    this->getNextFile(str);
-    emit setFile(str);
- //   refreshRemaining();
+//    QString str;
+//    this->getNextFile();
+//    refreshRemaining();
 }
 
 /*

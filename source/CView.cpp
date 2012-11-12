@@ -79,8 +79,13 @@ void CView::onInfoReceived(QString key, QVariant value)
     if (key.compare("remainingImage") == 0) {
         ui->lblRemaining->setText(QString("%1").arg(value.toInt()));
     }
+
     if (key.compare("remainingPDF") == 0) {
         ui->lblSent->setText(QString("%1").arg(value.toInt()));
+    }
+
+    if (key.compare("image") == 0) {
+        m_panel->setImage(value.value<QImage>());
     }
 }
 
@@ -92,7 +97,12 @@ void CView::displayError(int errorId)
     QMessageBox::critical(this, tr("Courrier"),
                              tr("Le fichier de configuration est introuvable.\nLe programme va se terminer."),
                              QMessageBox::Ok);
-    emit criticalError();
+    break;
+
+    case CError::UNKNOWNDIR:
+    QMessageBox::critical(this, tr("Courrier"),
+                             tr("Les répertoires sont incorrects. Utilisez l'option de configuration."),
+                             QMessageBox::Ok);
     break;
     }
 }
