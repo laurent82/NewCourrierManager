@@ -10,7 +10,9 @@ public:
         UNKNOWNDIR,
         NOPATIENT,
         INVALIDDATE,
-        EMPTYFIELD
+        EMPTYFIELD,
+        RENAME,
+        NOMOREFILE
     };
 };
 

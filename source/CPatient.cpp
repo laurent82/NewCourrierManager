@@ -4,6 +4,7 @@ CPatient* CPatient::m_instance = 0;
 
 CPatient::CPatient()
 {
+    m_parameters["patient_table"] = false;
 }
 
 CPatient* CPatient::instance()

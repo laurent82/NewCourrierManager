@@ -89,6 +89,19 @@ void CView::onInfoReceived(QString key, QVariant value)
     if (key.compare("image") == 0) {
         m_panel->setImage(value.value<QImage>());
     }
+
+    if (key.compare("addToTable") == 0) {
+        if (value.toBool() == true) {
+            QString fullName = CPatient::instance()->getParameter("patient_name").toString();
+            fullName.append(", ");
+            fullName.append(CPatient::instance()->getParameter("patient_surname").toString());
+            fullName.append(QString(" (%1 - %2)").arg(
+                                CPatient::instance()->getParameter("patient_page").toInt()).arg(
+                                CPatient::instance()->getParameter("patient_date").toString()));
+            m_lastAdded->prepend(fullName);
+            m_lastAddedModel->setStringList(*m_lastAdded);
+        }
+    }
 }
 
 void CView::displayError(int errorId)
@@ -121,6 +134,18 @@ void CView::displayError(int errorId)
     QMessageBox::critical(this, tr("Courrier"),
                              tr("Un champ est vide..."),
                              QMessageBox::Ok);
+    break;
+
+    case CError::RENAME:
+        QMessageBox::critical(this, tr("Courrier"),
+                              tr("Une erreur est survenue lors de la gestion de ce courrier. Le courrier a-t'il été recherché?"),
+                              QMessageBox::Ok);
+    break;
+
+    case CError::NOMOREFILE:
+        QMessageBox::information(this, tr("Courrier"),
+                              tr("Il n'y a plus de courrier à classer."),
+                              QMessageBox::Ok);
     break;
     }
 }
@@ -259,6 +284,28 @@ void CView::on_btnSamePatient_clicked()
     ui->spPage->setValue(page);
 }
 
+void CView::on_txtName_textEdited(QString _txt){
+    if (ui->cbFastSearch->isChecked()){
+        m_fastsearch->setWord(_txt.toUpper());
+        m_fastsearch->run();
+        m_modele->setStringList(*m_fastsearch->getCurrentList());
+    }
+    CPatient::instance()->configure("patient_table", false);
+}
+
+void CView::on_txtSurname_textEdited(QString _txt){
+    CPatient::instance()->configure("patient_table", false);
+}
+
+void CView::on_tablePatient_clicked(){
+    int i = ui->tablePatient->currentIndex().row();
+    QString str;
+    m_fastsearch->getItem(i, str);
+    ui->txtName->setText(str.section(',',0,0));
+    ui->txtSurname->setText(str.section(", ", 1,1));
+    CPatient::instance()->configure("patient_table", true);
+}
+
 //void CView::onRefreshRemaining(int iRemaining, int iSendRemaining)
 //{
 //    ui->lblRemaining->setText(QString("%1").arg(iRemaining));
@@ -302,34 +349,7 @@ void CView::on_btnSamePatient_clicked()
 
 //void CView::on_btnValidate_clicked()
 //{
-//    // Récupération des infos des champs.
-//    QString date;
-//    if (constructDate(date)){
-//        if (ui->txtName->text().isEmpty() || ui->txtSurname->text().isEmpty() || ui->txtDay->text().isEmpty()
-//            ||  ui->txtMonth->text().isEmpty() || ui->txtYear->text().isEmpty() ){
-//            QMessageBox::warning(this, tr("Courrier"),
-//                                 tr("Un des champs est vide..."),
-//                                 QMessageBox::Ok);
-//            return;
-//        }
-//        CPatient::instance()->clear();
-//        CPatient::instance()->configure("patient_name", QVariant(ui->txtName->text().toUpper()));
-//        CPatient::instance()->configure("patient_surname", QVariant(ui->txtSurname->text().toLower()));
-//        CPatient::instance()->configure("patient_date", QVariant(date));
-//        CPatient::instance()->configure("patient_page", QVariant(ui->spPage->value()));
-//        emit btnValidateClicked();
 
-//        /*
-//        if (!m_gestion->renameFile(m_tableUsed)){
-//            QMessageBox::critical(this, tr("Courrier"),
-//                                  tr("Une erreur est survenue lors de la gestion de ce courrier. Le courrier a-t'il été recherché?"),
-//                                  QMessageBox::Ok);
-//        }
-//        else{
-//            prepareNext();
-//            m_lastAddedModel->setStringList(*m_lastAdded);
-//        }
-//        */
 //    }
 //}
 
@@ -340,27 +360,7 @@ void CView::on_btnSamePatient_clicked()
 
 
 
-//void CView::on_txtName_textEdited(QString _txt){
-//    if (ui->cbFastSearch->isChecked()){
-//        m_fastsearch->setWord(_txt.toUpper());
-//        m_fastsearch->run();
-//        m_modele->setStringList(*m_fastsearch->getCurrentList());
-//    }
-//    m_tableUsed = false;
-//}
 
-//void CView::on_txtSurname_textEdited(QString _txt){
-//    m_tableUsed = false;
-//}
-
-//void CView::on_tablePatient_clicked(){
-//    int i = ui->tablePatient->currentIndex().row();
-//    QString str;
-//    m_fastsearch->getItem(i, str);
-//    ui->txtName->setText(str.section(',',0,0));
-//    ui->txtSurname->setText(str.section(", ", 1,1));
-//    m_tableUsed = true;
-//}
 
 //void CView::on_btnSend_clicked(){
 //    /*

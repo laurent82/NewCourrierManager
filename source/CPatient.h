@@ -16,6 +16,7 @@ public:
       * patient_surname:   Prénom du patient    (QString)
       * patient_date:      Date du document     (QString)
       * patient_page:      Numero de la page    (int)
+      * patient_table:     Le patient provient de la table (bool)
       */
     QVariant getParameter(const QString& key) const;
 

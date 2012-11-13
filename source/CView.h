@@ -42,12 +42,14 @@ protected slots:
     void on_btnLastDate_clicked();
     void on_btnSamePatient_clicked();
 
+    // Slots utilisés pour la gestion de la recherche rapide.
+    void on_txtName_textEdited(QString);
+    void on_txtSurname_textEdited(QString);
+    void on_tablePatient_clicked();
 
  //   void on_btnValidate_clicked(); // Signal émis lorsque les infos de la page sont validés.
 
-//    void on_txtName_textEdited(QString);
-//    void on_txtSurname_textEdited(QString);
-//    void on_tablePatient_clicked();
+
 //    void on_btnSend_clicked();
 //    void on_btnNext_clicked();
 //    void on_btnDelete_clicked();

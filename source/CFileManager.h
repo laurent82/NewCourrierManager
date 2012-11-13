@@ -47,7 +47,7 @@ public:
     // - copie sur le serveur
     ///////////////////////////////////////
 
-    bool renameFile(QFile* file, bool tableUsed = false);
+    bool renameFile(/*QFile* file, bool tableUsed = false*/);
 
     void initCopyFile();
 
@@ -63,10 +63,6 @@ public:
     ///////////////////////////////////////
     // Autres
     ///////////////////////////////////////
-
-    void setInfo(QString, QString, QString, int);
-    void getInfo(QString&, QString&, QString&, int&);
-    void getDate(QString&);
 
     void setFastSearch(CFastSearch*);
     void setLastAdded(QStringList*);
