@@ -24,9 +24,9 @@ CView::CView(QWidget *parent)
    // this->showMaximized();
 
     // Ajout des derniers
-    m_lastAdded = new QStringList;
-    m_lastAddedModel = new QStringListModel(*m_lastAdded);
-    ui->tableLast->setModel(m_lastAddedModel);
+    m_history = new QStringList;
+    m_historyModel = new QStringListModel(*m_history);
+    ui->tableLast->setModel(m_historyModel);
 
     // Recherche rapide
     m_fastsearch = new CFastSearch();
@@ -61,8 +61,8 @@ CView::~CView()
     delete ui;
     delete m_fastsearch;
     delete m_modele;
-    delete m_lastAdded;
-    delete m_lastAddedModel;
+    delete m_history;
+    delete m_historyModel;
 }
 
 
@@ -80,6 +80,9 @@ void CView::onInfoReceived(QString key, QVariant value)
 {
     if (key.compare("remainingImage") == 0) {
         ui->lblRemaining->setText(QString("%1").arg(value.toInt()));
+        if (value.toInt() == 0) {
+            displayError(CError::NOMOREFILE);
+        }
     }
 
     if (key.compare("remainingPDF") == 0) {
@@ -90,7 +93,7 @@ void CView::onInfoReceived(QString key, QVariant value)
         m_panel->setImage(value.value<QImage>());
     }
 
-    if (key.compare("addToTable") == 0) {
+    if (key.compare("addToHistory") == 0) {
         if (value.toBool() == true) {
             QString fullName = CPatient::instance()->getParameter("patient_name").toString();
             fullName.append(", ");
@@ -98,8 +101,8 @@ void CView::onInfoReceived(QString key, QVariant value)
             fullName.append(QString(" (%1 - %2)").arg(
                                 CPatient::instance()->getParameter("patient_page").toInt()).arg(
                                 CPatient::instance()->getParameter("patient_date").toString()));
-            m_lastAdded->prepend(fullName);
-            m_lastAddedModel->setStringList(*m_lastAdded);
+            m_history->prepend(fullName);
+            m_historyModel->setStringList(*m_history);
         }
     }
 }
@@ -152,22 +155,23 @@ void CView::displayError(int errorId)
 
 
 
-bool CView::constructDate(QString &_date){
+QString CView::constructDate(){
+    QString date;
     int iDay = ui->txtDay->text().toInt();
     int iMonth = ui->txtMonth->text().toInt();
     int iYear = ui->txtYear->text().toInt();
     if (iDay < 1 || iDay > 31 || iMonth < 1 || iMonth > 12 || iYear < 1950 ){
         displayError(CError::INVALIDDATE);
-        return false;
+        return QString();
     }
-    _date = ui->txtYear->text();
+    date = ui->txtYear->text();
     if (iMonth< 10)
-        _date.append("0");
-    _date.append(QString("%1").arg(iMonth));
+        date.append("0");
+    date.append(QString("%1").arg(iMonth));
     if (iDay < 10)
-        _date.append("0");
-    _date.append(QString("%1").arg(iDay));
-    return true;
+        date.append("0");
+    date.append(QString("%1").arg(iDay));
+    return date;
 }
 
 void CView::setCurrentDate(){
@@ -228,13 +232,25 @@ bool CView::checkFields()
     }
 }
 
+void CView::fillPatient()
+{
+    CPatient::instance()->configure("patient_name",  ui->txtName->text());
+    CPatient::instance()->configure("patient_surname",  ui->txtSurname->text());
+    CPatient::instance()->configure("patient_date", constructDate());
+    CPatient::instance()->configure("patient_page", ui->spPage->value());
+    CPatient::instance()->configure("patient_table", m_tableUsed);
+
+}
+
 void CView::onButtonClicked()
 {
     QString name = sender()->property("commandName").toString();
 
     // Cas du bouton Valider
     if (name.compare("validate") == 0) {
-        if (!checkFields()) {
+        if (checkFields()) {
+            fillPatient();
+        } else {
             displayError(CError::EMPTYFIELD);
             return;
         }

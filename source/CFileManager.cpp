@@ -49,6 +49,21 @@ void CFileManager::loadConfigFile()
     m_destinationDir = QString(strDestination.c_str());
     m_backupDir = QString(strBackup.c_str());
     m_PDFDir = QString(strPDF.c_str());
+    if (m_searchDir.right(1).compare("/")) {
+        m_searchDir.append('/');
+    }
+    if (m_transferDir.right(1).compare("/")) {
+        m_transferDir.append('/');
+    }
+    if (m_destinationDir.right(1).compare("/")) {
+        m_destinationDir.append("/");
+    }
+    if (m_backupDir.right(1).compare("/")) {
+        m_backupDir.append("/");
+    }
+    if (m_PDFDir.right(1).compare("/")) {
+        m_PDFDir.append("/");
+    }
     m_sendremaining = 0;
     }
     else {
@@ -98,9 +113,7 @@ void CFileManager::onCommandReceived(QString command)
     if (command.compare("validate") == 0) {
         // Renommer le fichier et ajout potentiel à la table
         if (renameFile()) {
-            if ( CPatient::instance()->getParameter("patient_table").toBool() == false ) {
-                emit sendInfo("addToTable", true);
-            }
+            emit sendInfo("addToHistory", true);
             prepareNext();
             refreshRemaining();
         }
@@ -213,14 +226,20 @@ bool CFileManager::convertPDF(QString _backupFileName){
 bool CFileManager::renameFile()
 {
     QString strFileName = constructFileName(TYPE_JPG);
+    QString backupFileName = strFileName;
     QString formerFileName = getFile();
+    if (formerFileName.isNull()) {
+        return false;
+    }
+    QFile file(formerFileName);
 
-    QFile formerImage(getFile());
+    qDebug() << "Ouverture du fichier...";
+//    if (!file.isOpen()) {
+//        return false;
+//    }
     // Ajout des répertoires:
     strFileName.prepend(m_transferDir);   // Ex: toTransfer/NomFichier.jpg
     backupFileName.prepend(m_backupDir);  // Ex: backup/NomFichier.jpg
-
-    QFile file(strFileToOpen);
 
     // Vérification du nom de fichier dans le cas où il
     // existerait déjà (erreur d'encodage, reprise...). Modifie le nom sinon.
@@ -232,10 +251,10 @@ bool CFileManager::renameFile()
         strFileName.prepend(m_transferDir);
         backupFileName.prepend(m_backupDir);
     }
-
+    qDebug() << "Copie et déplacement des fichiers...";
     // Copie du fichier de backup et suppression de l'original.
-    if ( !(file->copy(backupFileName)) ||
-         !(file->remove()) ) {
+    if ( !(file.copy(backupFileName)) ||
+         !(file.remove()) ) {
         return false;
     }
     return true;
@@ -245,6 +264,7 @@ QString CFileManager::constructFileName(int type)
 {
     QString fileName = QString();
     CPatient* patient = CPatient::instance();
+    qDebug() << "Patient:  " << patient->getParameter("patient_date").toString() << patient->getParameter("patient_surname").toString();
     switch(type){
     case TYPE_JPG:
         fileName = patient->getParameter("patient_date").toString();
@@ -294,7 +314,7 @@ QString CFileManager::getFile(){
     QString resp;
     if (!m_fileList->isEmpty()){
         if (m_i >= 0 && m_i < m_fileList->size())
-            resp = m_searchDir + "/" + m_fileList->at(m_i);
+            resp = m_searchDir + m_fileList->at(m_i);
     }
     return resp;
 }
@@ -411,6 +431,7 @@ void CFileManager::prepareNext()
         QImage image = QImage(fileToLoad);
         emit sendInfo("image", QVariant::fromValue<QImage>(image));
     } else {
+        emit sendInfo("image", QVariant::fromValue<QImage>(QImage()));
         emit errorOccur(CError::NOMOREFILE);
     }
 }

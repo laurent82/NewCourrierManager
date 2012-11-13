@@ -72,16 +72,20 @@ private:
     void resetInfoPatient();
 
     /**
+      * Rempli les infos de CPatient avec les différents champs.
+      */
+    void fillPatient();
+
+    /**
       * @brief Complète les champs "date" avec la date du jour.
       */
     void setCurrentDate();
 
     /**
       * @brief Construit un string représentant la date du jour.
-      * La date est format YYYYMMDD
-      * @return True si la date a pu être construite (erreur si la date ne peut être retrouvée).
+      * @return  La date est format YYYYMMDD
       */
-    bool constructDate(QString &_date);
+    QString constructDate();
 
     /**
      * @brief Extrait la date du QString d'entrée.
@@ -100,8 +104,8 @@ private:
     QString m_lastDate; /// Dernière date enregistrée.
 
     QStringListModel *m_modele;
-    QStringList* m_lastAdded;
-    QStringListModel* m_lastAddedModel;
+    QStringList* m_history;
+    QStringListModel* m_historyModel;
     CFastSearch* m_fastsearch;
     Ui::CourrierManagerClass *ui;
     CDrawPanelWidget* m_panel;
