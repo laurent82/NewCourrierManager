@@ -7,6 +7,8 @@
 #include <QProcess>
 #include <QDebug>
 #include <QVariant>
+#include <QPrinter>
+#include <QPainter>
 
 #include <QProgressDialog>
 #include <QApplication>
@@ -49,20 +51,21 @@ void CFileManager::loadConfigFile()
     m_destinationDir = QString(strDestination.c_str());
     m_backupDir = QString(strBackup.c_str());
     m_PDFDir = QString(strPDF.c_str());
-    if (m_searchDir.right(1).compare("/")) {
+
+    if (m_searchDir.right(1).compare("/") != 0) {
         m_searchDir.append('/');
     }
-    if (m_transferDir.right(1).compare("/")) {
+    if (m_transferDir.right(1).compare("/") != 0) {
         m_transferDir.append('/');
     }
-    if (m_destinationDir.right(1).compare("/")) {
-        m_destinationDir.append("/");
+    if (m_destinationDir.right(1).compare("/") != 0) {
+        m_destinationDir.append('/');
     }
-    if (m_backupDir.right(1).compare("/")) {
-        m_backupDir.append("/");
+    if (m_backupDir.right(1).compare("/") != 0) {
+        m_backupDir.append('/');
     }
-    if (m_PDFDir.right(1).compare("/")) {
-        m_PDFDir.append("/");
+    if (m_PDFDir.right(1).compare("/") != 0) {
+        m_PDFDir.append('/');
     }
     m_sendremaining = 0;
     }
@@ -112,6 +115,7 @@ void CFileManager::onCommandReceived(QString command)
     // Valider
     if (command.compare("validate") == 0) {
         // Renommer le fichier et ajout potentiel à la table
+        convertPDF();
         if (renameFile()) {
             emit sendInfo("addToHistory", true);
             prepareNext();
@@ -157,67 +161,80 @@ void CFileManager::search()
 
 void  CFileManager::convertPDFall()
 {
-    // Récupération de la liste des fichiers à copier
-    QDir dir(m_backupDir);
-    QStringList filters;
-    QStringList* filesToConvert = new QStringList;
-    filters << "*.jpg" << "*.JPG";
-    dir.setNameFilters(filters);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    QFileInfoList list = dir.entryInfoList();
-    for (int i = 0; i < list.size(); ++i) {
-        QFileInfo fileInfo = list.at(i);
-        filesToConvert->append(fileInfo.fileName());
-    }
-    QProgressDialog pd ("Conversion en cours...", "Annuler", 0, filesToConvert->size(), qApp->activeWindow(), Qt::Dialog);
-    pd.setAutoClose(false);
-    for (int i = 0; i < filesToConvert->size(); ++i){
-        // Extraction des données depuis le nom de fichier
-        pd.setValue(i);
-        QString currentFile = filesToConvert->at(i);
-        CPatient::instance()->configure("patient_date", currentFile.section('_',0,0));
-        CPatient::instance()->configure("patient_name", currentFile.section('_',1,1));
-        CPatient::instance()->configure("patient_surname", currentFile.section('_',2,2));
-        convertPDF(QString(m_backupDir + currentFile));
-    }
-    delete filesToConvert;
+//    // Récupération de la liste des fichiers à copier
+//    QDir dir(m_backupDir);
+//    QStringList filters;
+//    QStringList* filesToConvert = new QStringList;
+//    filters << "*.jpg" << "*.JPG";
+//    dir.setNameFilters(filters);
+//    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+//    QFileInfoList list = dir.entryInfoList();
+//    for (int i = 0; i < list.size(); ++i) {
+//        QFileInfo fileInfo = list.at(i);
+//        filesToConvert->append(fileInfo.fileName());
+//    }
+//    QProgressDialog pd ("Conversion en cours...", "Annuler", 0, filesToConvert->size(), qApp->activeWindow(), Qt::Dialog);
+//    pd.setAutoClose(false);
+//    for (int i = 0; i < filesToConvert->size(); ++i){
+//        // Extraction des données depuis le nom de fichier
+//        pd.setValue(i);
+//        QString currentFile = filesToConvert->at(i);
+//        CPatient::instance()->configure("patient_date", currentFile.section('_',0,0));
+//        CPatient::instance()->configure("patient_name", currentFile.section('_',1,1));
+//        CPatient::instance()->configure("patient_surname", currentFile.section('_',2,2));
+//        convertPDF(QString(m_backupDir + currentFile));
+//    }
+//    delete filesToConvert;
 }
 
-bool CFileManager::convertPDF(QString _backupFileName){
+bool CFileManager::convertPDF(){
     // Création du nouveau nom
     QString strFileNamePDF = constructFileName(TYPE_PDF);
     QString strTransferNamePDF;
 
     strTransferNamePDF = m_transferDir + strFileNamePDF;
     strFileNamePDF.prepend(m_PDFDir);
+
+    // Le fichier n'existe pas: création d'un nouveau
     if (!QFile::exists( strFileNamePDF)){
-        QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(strFileNamePDF));
+        QImage imageToPrint(getFile());
+        QPrinter printer;
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setColorMode(QPrinter::Color);
+        printer.setOutputFileName("output.pdf");
+        printer.setResolution((int)(imageToPrint.dotsPerMeterX() * 0.0254 + 0.5)); // Dots per meter -> DPI
+        printer.setOrientation(QPrinter::Portrait);
+
+        QPainter painter(&printer);
+        painter.drawImage(QPoint(0, 0), imageToPrint);
+        painter.end();
+      //  QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(strFileNamePDF));
     }
     else{
-        // Conversion de l'image en PDF
-        QString tempName = m_PDFDir + "temp.pdf";
-        QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(tempName));
-        // Renommage du PDF originale
-        QString startName = m_PDFDir + "start.pdf";
-        QFile file(strFileNamePDF);
-        file.rename(startName);
-        // Concat à l'aide de PDFTK
-        QProcess::execute(QString("pdftk.exe %1 %2 cat output %3").arg(startName).arg(tempName).arg(strFileNamePDF));
-        // Suppression des fichiers temporaires
-        QFile file2(tempName);
-        QFile file3(startName);
-        file2.remove();
-        file3.remove();
-    }
-    // Ajout dans le répertoire toTransfer
-    // Suppression de l'ancienne version si elle existe
-    if (QFile::exists( strTransferNamePDF)){
-        QFile file(strTransferNamePDF);
-        file.remove();
+//        // Conversion de l'image en PDF
+//        QString tempName = m_PDFDir + "temp.pdf";
+//        QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(tempName));
+//        // Renommage du PDF originale
+//        QString startName = m_PDFDir + "start.pdf";
+//        QFile file(strFileNamePDF);
+//        file.rename(startName);
+//        // Concat à l'aide de PDFTK
+//        QProcess::execute(QString("pdftk.exe %1 %2 cat output %3").arg(startName).arg(tempName).arg(strFileNamePDF));
+//        // Suppression des fichiers temporaires
+//        QFile file2(tempName);
+//        QFile file3(startName);
+//        file2.remove();
+//        file3.remove();
+//    }
+//    // Ajout dans le répertoire toTransfer
+//    // Suppression de l'ancienne version si elle existe
+//    if (QFile::exists( strTransferNamePDF)){
+//        QFile file(strTransferNamePDF);
+//        file.remove();
     }
     // Copie du fichier
-    QFile file4(strFileNamePDF);
-    file4.copy(strTransferNamePDF);
+    QFile file(strFileNamePDF);
+    file.copy(strTransferNamePDF);
 
 
     return true;
@@ -232,11 +249,6 @@ bool CFileManager::renameFile()
         return false;
     }
     QFile file(formerFileName);
-
-    qDebug() << "Ouverture du fichier...";
-//    if (!file.isOpen()) {
-//        return false;
-//    }
     // Ajout des répertoires:
     strFileName.prepend(m_transferDir);   // Ex: toTransfer/NomFichier.jpg
     backupFileName.prepend(m_backupDir);  // Ex: backup/NomFichier.jpg
@@ -251,7 +263,7 @@ bool CFileManager::renameFile()
         strFileName.prepend(m_transferDir);
         backupFileName.prepend(m_backupDir);
     }
-    qDebug() << "Copie et déplacement des fichiers...";
+
     // Copie du fichier de backup et suppression de l'original.
     if ( !(file.copy(backupFileName)) ||
          !(file.remove()) ) {
@@ -264,7 +276,6 @@ QString CFileManager::constructFileName(int type)
 {
     QString fileName = QString();
     CPatient* patient = CPatient::instance();
-    qDebug() << "Patient:  " << patient->getParameter("patient_date").toString() << patient->getParameter("patient_surname").toString();
     switch(type){
     case TYPE_JPG:
         fileName = patient->getParameter("patient_date").toString();
@@ -431,7 +442,6 @@ void CFileManager::prepareNext()
         QImage image = QImage(fileToLoad);
         emit sendInfo("image", QVariant::fromValue<QImage>(image));
     } else {
-        emit sendInfo("image", QVariant::fromValue<QImage>(QImage()));
         emit errorOccur(CError::NOMOREFILE);
     }
 }

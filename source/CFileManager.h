@@ -87,7 +87,7 @@ private:
 
     void prepareNext();
 
-    bool convertPDF(QString);
+    bool convertPDF();
 
     /**
       * Crée le nom du fichier en fonction du type
