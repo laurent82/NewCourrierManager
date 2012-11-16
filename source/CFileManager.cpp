@@ -115,7 +115,6 @@ void CFileManager::onCommandReceived(QString command)
     // Valider
     if (command.compare("validate") == 0) {
         // Renommer le fichier et ajout potentiel à la table
-        convertPDF();
         if (renameFile()) {
             emit sendInfo("addToHistory", true);
             prepareNext();
@@ -202,7 +201,9 @@ bool CFileManager::convertPDF(){
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setColorMode(QPrinter::Color);
         printer.setOutputFileName("output.pdf");
+        printer.setPaperSize(QSize(imageToPrint.widthMM(),imageToPrint.heightMM()), QPrinter::Millimeter);
         printer.setResolution((int)(imageToPrint.dotsPerMeterX() * 0.0254 + 0.5)); // Dots per meter -> DPI
+        printer.setPageMargins(0,0,0,0, QPrinter::Millimeter);
         printer.setOrientation(QPrinter::Portrait);
 
         QPainter painter(&printer);
