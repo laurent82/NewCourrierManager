@@ -94,7 +94,7 @@ private:
       * Recherche tous les fichiers JPG correspondant
       * à un patient pour la date du fichier en cours.
       */
-    void searchJPGForPatient();
+    QStringList searchJPGForPatient();
 
     /**
       * Crée le nom du fichier en fonction du type

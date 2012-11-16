@@ -200,7 +200,7 @@ bool CFileManager::convertPDF(){
         QPrinter printer;
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setColorMode(QPrinter::Color);
-        printer.setOutputFileName("output.pdf");
+        printer.setOutputFileName(constructFileName(TYPE_PDF));
         printer.setPaperSize(QSize(imageToPrint.widthMM(),imageToPrint.heightMM()), QPrinter::Millimeter);
         printer.setResolution((int)(imageToPrint.dotsPerMeterX() * 0.0254 + 0.5)); // Dots per meter -> DPI
         printer.setPageMargins(0,0,0,0, QPrinter::Millimeter);
@@ -209,9 +209,13 @@ bool CFileManager::convertPDF(){
         QPainter painter(&printer);
         painter.drawImage(QPoint(0, 0), imageToPrint);
         painter.end();
-      //  QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(strFileNamePDF));
     }
     else{
+        // Le fichier existe déjà.
+        // Recherche de tous les noms de fichier.
+        searchJPGForPatient();
+
+
 //        // Conversion de l'image en PDF
 //        QString tempName = m_PDFDir + "temp.pdf";
 //        QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(tempName));
@@ -303,6 +307,15 @@ QString CFileManager::constructFileName(int type)
         fileName.append(month);
         fileName.append(year);
         fileName.append("_RESUMECONTACT.pdf");
+        break;
+    case TYPE_RADICAL:
+        fileName = patient->getParameter("patient_date").toString();
+        fileName.append("_");
+        fileName.append(patient->getParameter("patient_name").toString());
+        fileName.append("_");
+        fileName.append(patient->getParameter("patient_surname").toString());
+        fileName.append("_");
+        break;
     }
     return fileName;
 }
@@ -446,6 +459,18 @@ void CFileManager::prepareNext()
         emit errorOccur(CError::NOMOREFILE);
     }
 }
+
+QStringList CFileManager::searchJPGForPatient()
+{
+    QStringList list;
+    QString radical = constructFileName(TYPE_RADICAL);
+    QDir dir (m_backupDir);
+    list = dir.entryList(QStringList(radical), QDir::Files | QDir::NoSymLinks);
+    qDebug() << "Nombre de fichiers trouvés pour le PDF: " << list.count();
+    return list;
+
+}
+
 
 /*
 void CFileManager::onBtnSearchClicked()
