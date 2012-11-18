@@ -47,10 +47,15 @@ CView::CView(QWidget *parent)
     ui->btnSearch->setProperty("commandName", "search");
     ui->btnDelete->setProperty("commandName", "delete");
     ui->btnValidate->setProperty("commandName", "validate");
+    ui->btnNext->setProperty("commandName", "skip");
+    ui->btnDelete->setProperty("commandName", "delete");
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnValidate, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnNext, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
@@ -146,6 +151,7 @@ void CView::displayError(int errorId)
     break;
 
     case CError::NOMOREFILE:
+        m_panel->setImage(QImage()); // Efface l'image courante.
         QMessageBox::information(this, tr("Courrier"),
                               tr("Il n'y a plus de courrier à classer."),
                               QMessageBox::Ok);
@@ -232,6 +238,14 @@ bool CView::checkFields()
     }
 }
 
+void CView::clearFields()
+{
+    ui->txtName->setText("");
+    ui->txtSurname->setText("");
+    ui->spPage->setValue(1);
+    setCurrentDate();
+}
+
 void CView::fillPatient()
 {
     CPatient::instance()->configure("patient_name",  ui->txtName->text());
@@ -250,6 +264,7 @@ void CView::onButtonClicked()
     if (name.compare("validate") == 0) {
         if (checkFields()) {
             fillPatient();
+            clearFields();
         } else {
             displayError(CError::EMPTYFIELD);
             return;

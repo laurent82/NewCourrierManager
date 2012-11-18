@@ -35,8 +35,8 @@ QVariant CPatient::getParameter(const QString &key) const
 
 void CPatient::incrementPage()
 {
-    if (!m_parameters.contains("page"))
+    if (!m_parameters.contains("patient_page"))
         return;
-    int pageNumber = m_parameters["page"].toInt();
-    m_parameters["page"] = ++pageNumber;
+    int pageNumber = m_parameters["patient_page"].toInt();
+    m_parameters["patient_page"] = ++pageNumber;
 }

@@ -77,6 +77,11 @@ private:
     void fillPatient();
 
     /**
+      * Vide tous les champs
+      */
+    void clearFields();
+
+    /**
       * @brief Complète les champs "date" avec la date du jour.
       */
     void setCurrentDate();

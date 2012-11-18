@@ -502,11 +502,10 @@ void CFileManager::deleteFile()
 {
     QString strFileToOpen = getFile();
     QFile file(strFileToOpen);
-    if (file.remove())
+    if (file.remove()) {
         prepareNext();
-    else {
+    } else {
         // emit errorOccur();
-
     }
 }
 

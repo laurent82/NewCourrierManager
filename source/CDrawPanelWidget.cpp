@@ -28,13 +28,11 @@ void CDrawPanelWidget::setPanelSize (int _w, int _h){
 
 bool CDrawPanelWidget::setImage(const QImage& image)
 {
-    qDebug() << "Setting image";
     if (!image.isNull()) {
         m_image = image;
         m_imageScaled = m_image.scaledToHeight(m_height);
         m_drawImage = true;
     } else {
-        qDebug() << "Image is null";
         m_drawImage = false;
         m_drawZoom = false;
     }
