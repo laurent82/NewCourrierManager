@@ -14,6 +14,7 @@
 #include <QApplication>
 
 #include "CError.h"
+#include "CDate.h"
 
 // Lecture, écriture de fichier
 // A remplacer avec les fonctions Qt ?
@@ -134,7 +135,8 @@ void CFileManager::onCommandReceived(QString command)
 
     // Delete
     if (command.compare("delete") == 0) {
-
+        deleteFile();
+        refreshRemaining();
     }
 }
 
@@ -212,6 +214,8 @@ bool CFileManager::convertPDF(){
         QFile formerTransferPDF(strTransferNamePDF);
         formerPDF.remove();
         formerTransferPDF.remove();
+    } else {
+        ++m_sendremaining;
     }
     // Recherche de tous les noms de fichier.
     QStringList listFiles = searchJPGForPatient();
@@ -308,7 +312,7 @@ QString CFileManager::constructFileName(int type)
 {
     QString fileName = QString();
     CPatient* patient = CPatient::instance();
-    QString day, month, year;
+    QString date, day, month, year;
 
     switch(type){
     case TYPE_JPG:
@@ -327,10 +331,8 @@ QString CFileManager::constructFileName(int type)
         fileName.append(patient->getParameter("patient_surname").toString().toUpper());
         fileName.append("_$_");
         // Conversion de la date au format JJMMAAAA
-
-        // FIXME
-        //extractDate(patient->getParameter("date").toString(), day, month, year);
-
+        date = patient->getParameter("patient_date").toString();
+        CDate::extractDate(date, day, month, year);
         fileName.append(day);
         fileName.append(month);
         fileName.append(year);
@@ -351,7 +353,7 @@ QString CFileManager::constructFileName(int type)
 
 void CFileManager::refreshRemaining()
 {
-    int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() : 0;
+    int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() - m_i: 0;
     int iSendRemaining = m_sendremaining;
     emit sendInfo("remainingImage", QVariant(iRemaining));
     emit sendInfo("remainingPDF", QVariant(iSendRemaining));
@@ -359,7 +361,7 @@ void CFileManager::refreshRemaining()
 
 
 QString CFileManager::getNextFile(){
-    m_i++;
+    ++m_i;
     return getFile();
 }
 
@@ -498,28 +500,15 @@ QStringList CFileManager::searchJPGForPatient()
     return list;
 }
 
-void CFileManager::deleteFile()
+bool CFileManager::deleteFile()
 {
     QString strFileToOpen = getFile();
     QFile file(strFileToOpen);
-    if (file.remove())
+    if (file.remove()) {
         prepareNext();
-    else {
-        // emit errorOccur();
-
+        return true;
+    } else {
+        emit errorOccur(CError::DELETEFILE);
+        return false;
     }
 }
-
-
-/*
-void CFileManager::onBtnSearchClicked()
-{
-    search();
-    QString str;
-    getFile(str);
-    emit setFile(str);
-    refreshRemaining();
-}
-
-
-*/

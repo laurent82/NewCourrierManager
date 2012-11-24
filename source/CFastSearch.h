@@ -17,6 +17,8 @@ public:
     bool isInList(QString);
     QStringList* getCurrentList();
     QStringList* getFullList();
+    void appendNewPatient();
+
 private:
     void readPatientList();
     int computeScore(int);
@@ -26,7 +28,7 @@ private:
     int m_size;
     bool m_searching;
     bool m_fullSorted;
- //   QVector<int> m_score;
+
 };
 
 #endif // CFASTSEARCH_H

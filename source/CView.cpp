@@ -11,7 +11,9 @@
 
 #include "CError.h"
 #include "CPatient.h"
+#include "CDate.h"
 
+#include <QDebug>
 
 CView::CView(QWidget *parent)
     : QDialog(parent), ui(new Ui::CourrierManagerClass)
@@ -33,11 +35,6 @@ CView::CView(QWidget *parent)
     m_modele = new QStringListModel(*m_fastsearch->getCurrentList());
     ui->tablePatient->setModel(m_modele);
 
-/*
-    m_gestion = new CGestion();
-    m_gestion->setFastSearch(m_fastsearch);
-    m_gestion->setLastAdded(m_lastAdded);
-*/
     ui->btnBack->setVisible(false);
    // ui->btnSend->setVisible(false);
     ui->btnConvert->setVisible(false);
@@ -56,6 +53,8 @@ CView::CView(QWidget *parent)
     connect (ui->btnNext, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
+
+
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
@@ -69,7 +68,6 @@ CView::~CView()
     delete m_history;
     delete m_historyModel;
 }
-
 
 void CView::resizeEvent(QResizeEvent* event){
     int height = this->height() - 20;
@@ -156,28 +154,20 @@ void CView::displayError(int errorId)
                               tr("Il n'y a plus de courrier à classer."),
                               QMessageBox::Ok);
     break;
+
+
+    case CError::DELETEFILE:
+        QMessageBox::critical(this, tr("Courrier"),
+                              tr("Erreur lors de la suppression du fichier."),
+                              QMessageBox::Ok);
+    break;
+
+    default:
+        QMessageBox::critical(this, tr("Courrier"),
+                              tr("Erreur non répertoriée."),
+                              QMessageBox::Ok);
+    break;
     }
-}
-
-
-
-QString CView::constructDate(){
-    QString date;
-    int iDay = ui->txtDay->text().toInt();
-    int iMonth = ui->txtMonth->text().toInt();
-    int iYear = ui->txtYear->text().toInt();
-    if (iDay < 1 || iDay > 31 || iMonth < 1 || iMonth > 12 || iYear < 1950 ){
-        displayError(CError::INVALIDDATE);
-        return QString();
-    }
-    date = ui->txtYear->text();
-    if (iMonth< 10)
-        date.append("0");
-    date.append(QString("%1").arg(iMonth));
-    if (iDay < 10)
-        date.append("0");
-    date.append(QString("%1").arg(iDay));
-    return date;
 }
 
 void CView::setCurrentDate(){
@@ -185,33 +175,6 @@ void CView::setCurrentDate(){
     ui->txtDay->setText(QString("%1").arg(date.day()));
     ui->txtMonth->setText(QString("%1").arg(date.month()));
     ui->txtYear->setText(QString("%1").arg(date.year()));
-}
-
-void CView::extractDate(const QString &date, QString& day, QString& month, QString& year)
-{
-    QChar c;
-    QString var = "";
-
-    // Récupère l'année
-    for (int i = 0; i < 4; ++i){
-        c = date.at(i);
-        var.append(c);
-    }
-    year = var;
-    // Récupère le mois
-    var.clear();
-    c = date.at(4);
-    var.append(c);
-    c = date.at(5);
-    var.append(c);
-    month = var;
-    // Récupère le jour
-    var.clear();
-    c = date.at(6);
-    var.append(c);
-    c = date.at(7);
-    var.append(c);
-    day = var;
 }
 
 void CView::resetInfoPatient()
@@ -256,6 +219,28 @@ void CView::fillPatient()
 
 }
 
+
+QString CView::constructDate()
+{
+    QString date;
+    int iDay = ui->txtDay->text().toInt();
+    int iMonth = ui->txtMonth->text().toInt();
+    int iYear = ui->txtYear->text().toInt();
+    if (iDay < 1 || iDay > 31 || iMonth < 1 || iMonth > 12 || iYear < 1950 ){
+        displayError(CError::INVALIDDATE);
+        return QString();
+    }
+    date = ui->txtYear->text();
+    if (iMonth< 10)
+        date.append("0");
+    date.append(QString("%1").arg(iMonth));
+    if (iDay < 10)
+        date.append("0");
+    date.append(QString("%1").arg(iDay));
+    return date;
+}
+
+
 void CView::onButtonClicked()
 {
     QString name = sender()->property("commandName").toString();
@@ -265,6 +250,9 @@ void CView::onButtonClicked()
         if (checkFields()) {
             fillPatient();
             clearFields();
+            if (!m_tableUsed) {
+                m_fastsearch->appendNewPatient();
+            }
         } else {
             displayError(CError::EMPTYFIELD);
             return;
@@ -282,7 +270,7 @@ void CView::on_btnLastDate_clicked()
 {
     QString day, month, year;
     if (!m_lastDate.isEmpty()){
-        extractDate(m_lastDate, day, month, year);
+        CDate::extractDate(m_lastDate, day, month, year);
         ui->txtYear->setText(year);
         ui->txtMonth->setText(month);
         ui->txtDay->setText(day);
@@ -308,7 +296,7 @@ void CView::on_btnSamePatient_clicked()
     }
     ui->txtName->setText(name);
     ui->txtSurname->setText(surname);
-    extractDate(date, day, month, year);
+    CDate::extractDate(date, day, month, year);
     ui->txtYear->setText(year);
     ui->txtMonth->setText(month);
     ui->txtDay->setText(day);
@@ -332,8 +320,8 @@ void CView::on_tablePatient_clicked(){
     int i = ui->tablePatient->currentIndex().row();
     QString str;
     m_fastsearch->getItem(i, str);
-    ui->txtName->setText(str.section(',',0,0));
-    ui->txtSurname->setText(str.section(", ", 1,1));
+    ui->txtName->setText(str.section(',',0,0).trimmed());
+    ui->txtSurname->setText(str.section(",", 1,1).trimmed());
     CPatient::instance()->configure("patient_table", true);
 }
 

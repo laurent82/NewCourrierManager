@@ -16,7 +16,8 @@ HEADERS += CView.h \
     CError.h \
     CPatient.h \
     CFileManager.h \
-    CConfigFrame.h
+    CConfigFrame.h \
+    CDate.h
 SOURCES += main.cpp \
     CView.cpp \
     CControler.cpp \
@@ -24,6 +25,7 @@ SOURCES += main.cpp \
     CFastSearch.cpp \
     CPatient.cpp \
     CFileManager.cpp \
-    CConfigFrame.cpp
+    CConfigFrame.cpp \
+    CDate.cpp
 
 FORMS += courriermanager.ui

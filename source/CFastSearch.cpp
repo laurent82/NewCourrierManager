@@ -1,5 +1,10 @@
 #include "CFastSearch.h"
+#include "CError.h"
+#include "CPatient.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
 #include <string>
 #include <fstream>
 using namespace std;
@@ -33,10 +38,14 @@ void CFastSearch::readPatientList(){
             if (!strline.isNull() && !strline.isEmpty()){
                 QString strToInsert = strline.section(';',0,0);
                 strToInsert.append(", ");
-                strToInsert.append(strline.section(';', 1, 1));
+                QString surname = strline.section(';', 1, 1);
+                surname[0] = surname[0].toUpper();
+                strToInsert.append(surname);
                 m_patientList->append(strToInsert);
             }
         }
+    } else {
+        qDebug() << "Fichier liste de patient non trouvé.";
     }
     m_patientList->sort();
 }
@@ -85,7 +94,6 @@ void CFastSearch::getItem(int i, QString& _rep){
             _rep = QString(m_patientList->at(i));
         }
     }
-//    qWarning("%s", _rep.toLatin1().data());
 }
 
 bool CFastSearch::isInList(QString _word){
@@ -116,4 +124,24 @@ void CFastSearch::run(){
     m_currentList->sort();
 }
 
+void CFastSearch::appendNewPatient()
+{
+    QString name = CPatient::instance()->getParameter("patient_name").toString().toUpper();
+    name.append(", ");
+    QString surname = CPatient::instance()->getParameter("patient_surname").toString().toLower();
+    surname[0] = surname[0].toUpper();
+    name.append(surname);
+    // Si le nom n'est pas encore dans la table, on l'enregistre.
+    if (!isInList(name)) {
+        name = CPatient::instance()->getParameter("patient_name").toString().toUpper();
+        name.append(";");
+        name.append(CPatient::instance()->getParameter("patient_surname").toString().toLower());
+        name.append(";");
+        QFile file("./patientlist.txt");
+        file.open(QIODevice::Append | QIODevice::Text);
+        QTextStream out(&file);
+        out << name << "\n";
+        file.close();
+    }
+}
 

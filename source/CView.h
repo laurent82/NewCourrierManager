@@ -32,7 +32,6 @@ public slots:
     void onInfoReceived(QString key, QVariant value);
     void displayError(int errorId);
 
-//    void onPrepareNext(const QString&);
 protected slots:
     // Bouton d'actions
     void onButtonClicked(); // Slot activé par un bouton, destiné à envoyer un message au controller.
@@ -46,15 +45,6 @@ protected slots:
     void on_txtName_textEdited(QString);
     void on_txtSurname_textEdited(QString);
     void on_tablePatient_clicked();
-
- //   void on_btnValidate_clicked(); // Signal émis lorsque les infos de la page sont validés.
-
-
-//    void on_btnSend_clicked();
-//    void on_btnNext_clicked();
-//    void on_btnDelete_clicked();
-//    void on_btnConvert_clicked();
-//    void copyCancel();
 
 signals:
     void sendCommand(QString);
@@ -91,15 +81,6 @@ private:
       * @return  La date est format YYYYMMDD
       */
     QString constructDate();
-
-    /**
-     * @brief Extrait la date du QString d'entrée.
-     * @param date (Entrée) Date au format YYYYMMDD
-     * @param day (Sortie) Jour
-     * @param month (Sortie) Mois
-     * @param year (Sortie) Année
-     */
-    void extractDate(const QString& date, QString& day, QString& month, QString& year);
 
     /**
       * @brief Vérifie que tous les champs sont remplis.

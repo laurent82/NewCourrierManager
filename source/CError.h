@@ -12,7 +12,9 @@ public:
         INVALIDDATE,
         EMPTYFIELD,
         RENAME,
-        NOMOREFILE
+        NOMOREFILE,
+        DELETEFILE,
+        NOPATIENTLIST
     };
 };
 
