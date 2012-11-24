@@ -1,6 +1,6 @@
 TARGET = NewCourrierManager
 TEMPLATE = app
-CONFIG += qt
+CONFIG += qt network
 MOC_DIR += ../../build/moc/
 UI_DIR = ../../build/ui
 OBJECTS_DIR = ../../build/obj/
@@ -17,7 +17,8 @@ HEADERS += CView.h \
     CPatient.h \
     CFileManager.h \
     CConfigFrame.h \
-    CDate.h
+    CDate.h \
+    CNetwork.h
 SOURCES += main.cpp \
     CView.cpp \
     CControler.cpp \
@@ -26,6 +27,7 @@ SOURCES += main.cpp \
     CPatient.cpp \
     CFileManager.cpp \
     CConfigFrame.cpp \
-    CDate.cpp
+    CDate.cpp \
+    CNetwork.cpp
 
 FORMS += courriermanager.ui

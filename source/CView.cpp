@@ -306,7 +306,7 @@ void CView::on_btnSamePatient_clicked()
 void CView::on_txtName_textEdited(QString _txt){
     if (ui->cbFastSearch->isChecked()){
         m_fastsearch->setWord(_txt.toUpper());
-        m_fastsearch->run();
+        m_fastsearch->start();
         m_modele->setStringList(*m_fastsearch->getCurrentList());
     }
     CPatient::instance()->configure("patient_table", false);

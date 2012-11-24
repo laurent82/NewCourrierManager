@@ -117,7 +117,7 @@ void CFileManager::onCommandReceived(QString command)
     if (command.compare("validate") == 0) {
         // Renommer le fichier et ajout potentiel à la table
         if (renameFile()) {
-            convertPDF();
+            this->start();
             emit sendInfo("addToHistory", true);
             prepareNext();
             refreshRemaining();
@@ -138,6 +138,13 @@ void CFileManager::onCommandReceived(QString command)
         deleteFile();
         refreshRemaining();
     }
+}
+
+void CFileManager::run()
+{
+    QString pdfName = constructFileName(TYPE_PDF);
+    QString radicalName = constructFileName(TYPE_RADICAL);
+    convertPDF(pdfName, radicalName);
 }
 
 void CFileManager::search()
@@ -200,9 +207,9 @@ void  CFileManager::convertPDFall()
 //    delete filesToConvert;
 }
 
-bool CFileManager::convertPDF(){
+bool CFileManager::convertPDF(const QString& pdfName, const QString& radicalName){
     // Création du nouveau nom
-    QString strFileNamePDF = constructFileName(TYPE_PDF);
+    QString strFileNamePDF = pdfName;
     QString strTransferNamePDF;
 
     strTransferNamePDF = m_transferDir + strFileNamePDF;
@@ -218,7 +225,7 @@ bool CFileManager::convertPDF(){
         ++m_sendremaining;
     }
     // Recherche de tous les noms de fichier.
-    QStringList listFiles = searchJPGForPatient();
+    QStringList listFiles = searchJPGForPatient(radicalName);
     if (listFiles.count() == 0) {
         return false;
     }
@@ -490,12 +497,11 @@ void CFileManager::prepareNext()
     }
 }
 
-QStringList CFileManager::searchJPGForPatient()
+QStringList CFileManager::searchJPGForPatient(const QString& radicalName)
 {
     QStringList list;
-    QString radical = constructFileName(TYPE_RADICAL);
     QDir dir (m_backupDir);
-    list = dir.entryList(QStringList(radical), QDir::Files | QDir::NoSymLinks);
+    list = dir.entryList(QStringList(radicalName), QDir::Files | QDir::NoSymLinks);
     list.sort();
     return list;
 }

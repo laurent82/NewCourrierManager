@@ -3,6 +3,7 @@
 
 class CView;
 class CFileManager;
+class CNetwork;
 
 #include <QObject>
 
@@ -11,6 +12,7 @@ class CControler : public QObject
     Q_OBJECT
 public:
     CControler();
+    ~CControler();
 
 
 public slots:
@@ -22,5 +24,6 @@ public slots:
 private:
     CView* m_view;
     CFileManager* m_fileManager;
+    CNetwork* m_network;
 };
     #endif

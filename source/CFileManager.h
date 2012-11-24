@@ -4,11 +4,12 @@
 #include <QStringList>
 #include <QString>
 #include <QFile>
+#include <QThread>
 
 #include "CFastSearch.h"
 #include "CPatient.h"
 
-class CFileManager : public QObject
+class CFileManager : public QThread
 {
     Q_OBJECT
 public:
@@ -20,6 +21,8 @@ public:
 
     CFileManager();
     ~CFileManager();
+
+    void run(); // Thread function
 
     ///////////////////////////////////////
     // Configuration
@@ -88,13 +91,13 @@ private:
 
     void prepareNext();
 
-    bool convertPDF();
+    bool convertPDF(const QString &pdfName, const QString &radicalName);
 
     /**
       * Recherche tous les fichiers JPG correspondant
       * à un patient pour la date du fichier en cours.
       */
-    QStringList searchJPGForPatient();
+    QStringList searchJPGForPatient(const QString &radicalName);
 
     /**
       * Crée le nom du fichier en fonction du type
