@@ -1,6 +1,7 @@
 TARGET = NewCourrierManager
 TEMPLATE = app
-CONFIG += qt network
+CONFIG += qt
+QT += network
 MOC_DIR += ../../build/moc/
 UI_DIR = ../../build/ui
 OBJECTS_DIR = ../../build/obj/

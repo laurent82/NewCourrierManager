@@ -18,7 +18,7 @@ public:
 public slots:
     void onError(int errorId);
     void onCriticalError();
-
+    void onCommandReceived(QString);
     void showConfigDialog();
 
 private:

@@ -13,8 +13,10 @@ CControler::CControler() : QObject()
     m_network = new CNetwork();
 
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
+    connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
     connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), m_view, SLOT(onInfoReceived(QString, QVariant)));
+
 
     connect(m_network, SIGNAL(connectedToHost()), m_view, SLOT(onConnectedToHost()));
     connect(m_network, SIGNAL(disconnectedToHost()), m_view, SLOT(onDisconnectedToHost()));
@@ -44,6 +46,14 @@ void CControler::onError(int errorId)
     }
 
 }
+
+void CControler::onCommandReceived(QString command)
+{
+    if (command.compare("connect", Qt::CaseInsensitive) == 0) {
+        m_network->connectToServer();
+    }
+}
+
 void CControler::onCriticalError()
 {
     exit(0);

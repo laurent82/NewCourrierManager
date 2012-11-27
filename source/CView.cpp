@@ -41,19 +41,21 @@ CView::CView(QWidget *parent)
 
     m_tableUsed = false;
 
+    ui->lblConnected->setStyleSheet("color: red;");
+
     ui->btnSearch->setProperty("commandName", "search");
     ui->btnDelete->setProperty("commandName", "delete");
     ui->btnValidate->setProperty("commandName", "validate");
     ui->btnNext->setProperty("commandName", "skip");
     ui->btnDelete->setProperty("commandName", "delete");
+    ui->btnConnect->setProperty("commandName", "connect");
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnValidate, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnNext, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
-
-
+    connect (ui->btnConnect, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
@@ -74,8 +76,8 @@ void CView::resizeEvent(QResizeEvent* event){
     int width =  (int)(height /1.41);
     m_panel->setPanelSize(width,height);
     int toolbarWidth = 680;
-    ui->toolBar->setGeometry(width + 25, 100, 540,toolbarWidth);
-    ui->topButtons->setGeometry(width + 25, 15, 540, 72);
+    ui->toolBar->move(width + 25, 100); //, 540,toolbarWidth);
+    ui->topButtons->move(width + 25, 15); // 540, 72);
     // this->setMaximumWidth(width + toolbarWidth + 110);
 }
 

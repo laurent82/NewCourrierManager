@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>975</width>
-    <height>885</height>
+    <height>851</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -31,7 +31,7 @@
      <x>390</x>
      <y>90</y>
      <width>541</width>
-     <height>671</height>
+     <height>751</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -342,8 +342,8 @@
    <widget class="QPushButton" name="btnConvert">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>600</y>
+      <x>150</x>
+      <y>590</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -377,6 +377,58 @@
     <property name="text">
      <string>Configuration</string>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="serverBar">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>680</y>
+      <width>521</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Serveur</string>
+    </property>
+    <widget class="QLabel" name="lblTitleConnected">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connecté:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lblConnected">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Non connecté</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnConnect">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>20</y>
+       <width>93</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reconnecter</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QFrame" name="topButtons">

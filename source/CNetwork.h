@@ -10,7 +10,7 @@ class CNetwork : public QObject
     Q_OBJECT
 public:
     CNetwork();
-    void connectToServer(const QString& strIp);
+    void connectToServer(const QString& strIp = "127.0.0.1");
     void sendFile(const QString& strFilePath);
 
 signals:
