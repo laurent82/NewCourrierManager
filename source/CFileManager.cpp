@@ -177,6 +177,23 @@ void CFileManager::search()
     m_i = 0;
 }
 
+QStringList CFileManager::getFilesToSend()
+{
+    QDir dir(m_transferDir);
+    QStringList pdfFilters;
+    pdfFilters << "*.pdf" << "*.PDF";
+    dir.setNameFilters(pdfFilters);
+    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    QFileInfoList list = dir.entryInfoList();
+    const int listSize = list.size();
+    QStringList sendList;
+    for (int i = 0; i < listSize; ++i) {
+        QFileInfo fileInfo = list[i];
+        sendList << QString("%1/%2").arg(fileInfo.path()).arg(fileInfo.fileName());
+    }
+    return sendList;
+}
+
 
 
 void  CFileManager::convertPDFall()

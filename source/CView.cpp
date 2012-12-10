@@ -44,6 +44,7 @@ CView::CView(QWidget *parent)
     ui->lblConnected->setStyleSheet("color: red;");
 
     ui->btnSearch->setProperty("commandName", "search");
+    ui->btnSend->setProperty("commandName", "send");
     ui->btnDelete->setProperty("commandName", "delete");
     ui->btnValidate->setProperty("commandName", "validate");
     ui->btnNext->setProperty("commandName", "skip");
@@ -52,6 +53,7 @@ CView::CView(QWidget *parent)
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnSend, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnValidate, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnNext, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));

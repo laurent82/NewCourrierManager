@@ -48,14 +48,16 @@ public:
     ///////////////////////////////////////
     // Gestion du courrier sortant
     // - renommage de fichiers
-    // - copie sur le serveur
+    // - préparation de la liste des fichiers à copier
     ///////////////////////////////////////
 
     bool renameFile(/*QFile* file, bool tableUsed = false*/);
 
-    void initCopyFile();
+    QStringList getFilesToSend();
 
-    bool copyNextFile();
+    void initCopyFile(); // Obsolète
+
+    bool copyNextFile(); // Obsolète
 
     ///////////////////////////////////////
     // Gestion de masse

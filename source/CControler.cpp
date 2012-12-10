@@ -16,7 +16,7 @@ CControler::CControler() : QObject()
     connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
     connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), m_view, SLOT(onInfoReceived(QString, QVariant)));
-
+    connect(this, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
 
     connect(m_network, SIGNAL(connectedToHost()), m_view, SLOT(onConnectedToHost()));
     connect(m_network, SIGNAL(disconnectedToHost()), m_view, SLOT(onDisconnectedToHost()));
@@ -49,8 +49,24 @@ void CControler::onError(int errorId)
 
 void CControler::onCommandReceived(QString command)
 {
+    qDebug() << "Commande reçue: " << command;
     if (command.compare("connect", Qt::CaseInsensitive) == 0) {
         m_network->connectToServer();
+    }
+
+    if (command.compare("send", Qt::CaseInsensitive) == 0) {
+        // Demande de la liste des fichier à envoyer
+        if (!m_fileManager) {
+            return;
+        }
+        QStringList list  = m_fileManager->getFilesToSend();
+
+        // Transmettre cette liste au manager réseau
+        if (m_network->isConnected()) {
+            m_network->sendList(list);
+        } else {
+            emit errorOccur(CError::NOTCONNECTED);
+        }
     }
 }
 

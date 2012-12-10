@@ -14,7 +14,8 @@ public:
         RENAME,
         NOMOREFILE,
         DELETEFILE,
-        NOPATIENTLIST
+        NOPATIENTLIST,
+        NOTCONNECTED
     };
 };
 

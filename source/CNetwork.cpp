@@ -17,6 +17,21 @@ void CNetwork::connectToServer(const QString& strIp)
     connect(&m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnectedFromHost()));
 }
 
+bool CNetwork::isConnected()
+{
+    return m_socket.isOpen();
+}
+
+void sendList(const QStringList list)
+{
+    if (isConnected()) {
+        foreach (QString strFileName, list) {
+            sendFile
+        }
+    }
+}
+
+
 void CNetwork::sendFile(const QString& strFilePath)
 {
     QFile fileToSend(strFilePath);

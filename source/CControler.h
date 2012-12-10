@@ -21,6 +21,9 @@ public slots:
     void onCommandReceived(QString);
     void showConfigDialog();
 
+signals:
+    void errorOccur(int);
+
 private:
     CView* m_view;
     CFileManager* m_fileManager;
