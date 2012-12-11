@@ -2,6 +2,7 @@
 #define CNETWORK_H
 
 #include <QString>
+#include <QStringList>
 #include <QtNetwork/QTcpSocket>
 
 
@@ -12,7 +13,7 @@ public:
     CNetwork();
     void connectToServer(const QString& strIp = "127.0.0.1");
     bool isConnected();
-    void sendList(const QStringList list);
+    void sendList(const QStringList &list);
     void sendFile(const QString& strFilePath);
 
 signals:
