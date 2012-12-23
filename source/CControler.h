@@ -20,11 +20,14 @@ public slots:
     void onCriticalError();
     void onCommandReceived(QString);
     void showConfigDialog();
+    void onFileSent();
+    void onAllFilesSent();
 
 signals:
     void errorOccur(int);
 
 private:
+    QString m_ip;
     CView* m_view;
     CFileManager* m_fileManager;
     CNetwork* m_network;

@@ -16,7 +16,8 @@
 #include <QDebug>
 
 CView::CView(QWidget *parent)
-    : QDialog(parent), ui(new Ui::CourrierManagerClass)
+    : QDialog(parent), ui(new Ui::CourrierManagerClass),
+      m_progress(0)
 {
     // Ui
     QApplication::setStyle(new QPlastiqueStyle/*QCleanlooksStyle*/);
@@ -59,6 +60,8 @@ CView::CView(QWidget *parent)
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnConnect, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
+    ui->btnSend->setEnabled(false);
+
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 }
@@ -82,6 +85,22 @@ void CView::resizeEvent(QResizeEvent* event){
     ui->topButtons->move(width + 25, 15); // 540, 72);
     // this->setMaximumWidth(width + toolbarWidth + 110);
 }
+
+void CView::setProgressBar(int total)
+{
+    m_progress = new QProgressDialog("Envoi des fichiers...", QString(), 0, total, this, Qt::Popup);
+    connect(m_progress, SIGNAL(finished(int)), m_progress, SLOT(deleteLater()));
+    m_progress->show();
+}
+
+void CView::updateProgressBar(int step)
+{
+    if (m_progress) {
+        m_progress->setValue(m_progress->value() + step);
+    }
+}
+
+
 
 void CView::onInfoReceived(QString key, QVariant value)
 {
@@ -166,8 +185,20 @@ void CView::displayError(int errorId)
                               QMessageBox::Ok);
     break;
 
-    default:
+    case CError::ALLFILESSENT:
+        QMessageBox::information(this, tr("Courrier"),
+                              tr("Tout le courrier a été envoyé."),
+                              QMessageBox::Ok);
+    break;
+
+    case CError::NETWORKPROBLEM:
         QMessageBox::critical(this, tr("Courrier"),
+                              tr("Une erreur s'est produite durant le transfert."),
+                              QMessageBox::Ok);
+    break;
+
+    default:
+        QMessageBox::information(this, tr("Courrier"),
                               tr("Erreur non répertoriée."),
                               QMessageBox::Ok);
     break;
@@ -327,6 +358,22 @@ void CView::on_tablePatient_clicked(){
     ui->txtName->setText(str.section(',',0,0).trimmed());
     ui->txtSurname->setText(str.section(",", 1,1).trimmed());
     CPatient::instance()->configure("patient_table", true);
+}
+
+void CView::onConnectedToHost()
+{
+    ui->btnSend->setEnabled(true);
+    ui->lblConnected->setStyleSheet("color: black;");
+    ui->lblConnected->setText("Connecté");
+    ui->btnConnect->setVisible(false);
+}
+
+void CView::onDisconnectedFromHost()
+{
+    ui->btnSend->setEnabled(false);
+    ui->lblConnected->setStyleSheet("color: red;");
+    ui->lblConnected->setText("Non connecté");
+    ui->btnConnect->setVisible(true);
 }
 
 //void CView::onRefreshRemaining(int iRemaining, int iSendRemaining)

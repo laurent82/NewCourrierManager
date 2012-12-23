@@ -24,6 +24,7 @@ private:
     QLineEdit* m_destinationLine;
     QLineEdit* m_backupLine;
     QLineEdit* m_PDFLine;
+    QLineEdit* m_IPLine;
 
     static CConfigFrame* m_instance;
 };

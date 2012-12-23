@@ -34,17 +34,18 @@ CFileManager::~CFileManager(){
 
 
 
-void CFileManager::loadConfigFile()
+void CFileManager::loadConfigFile(QString& ip)
 {
     // Lecture des paramètres
     ifstream file("config.txt");
     if (file) {
-    string strSearch, strTransfert, strDestination, strBackup, strPDF;
+    string strSearch, strTransfert, strDestination, strBackup, strPDF, strIP;
     getline(file, strSearch);
     getline(file, strTransfert);
     getline(file, strDestination);
     getline(file, strBackup);
     getline(file, strPDF);
+    getline(file, strIP);
     m_fileList = new QStringList();
     m_fileToCopyList = 0;
     m_searchDir = QString(strSearch.c_str());
@@ -52,6 +53,7 @@ void CFileManager::loadConfigFile()
     m_destinationDir = QString(strDestination.c_str());
     m_backupDir = QString(strBackup.c_str());
     m_PDFDir = QString(strPDF.c_str());
+    ip = QString(strIP.c_str());
 
     if (m_searchDir.right(1).compare("/") != 0) {
         m_searchDir.append('/');
@@ -125,6 +127,10 @@ void CFileManager::onCommandReceived(QString command)
         else{
             emit errorOccur(CError::RENAME);
         }
+    }
+    // Update
+    if (command.compare("refresh")) {
+        refreshRemaining();
     }
 
     // Skip

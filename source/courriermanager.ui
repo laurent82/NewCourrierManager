@@ -395,18 +395,18 @@
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>61</width>
+       <width>41</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Connecté:</string>
+      <string>Etat:</string>
      </property>
     </widget>
     <widget class="QLabel" name="lblConnected">
      <property name="geometry">
       <rect>
-       <x>90</x>
+       <x>60</x>
        <y>30</y>
        <width>91</width>
        <height>16</height>

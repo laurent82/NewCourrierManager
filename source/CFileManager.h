@@ -28,7 +28,7 @@ public:
     // Configuration
     ///////////////////////////////////////
 
-    void loadConfigFile();
+    void loadConfigFile(QString &ip);
 
     ///////////////////////////////////////
     // Gestion courrier entrant

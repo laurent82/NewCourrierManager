@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core network
 
 QT       -= gui
 
@@ -16,3 +16,9 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp
+
+HEADERS += \
+    CServer.h
+
+SOURCES += \
+    CServer.cpp

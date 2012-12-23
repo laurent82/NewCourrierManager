@@ -7,7 +7,7 @@
 #include "CDrawPanelWidget.h"
 #include "CFastSearch.h"
 #include <QStringListModel>
-
+#include <QProgressDialog>
 /**
   * Interface graphique
   *
@@ -24,6 +24,8 @@ class CView : public QDialog
 public:
     CView(QWidget *parent = 0);
     ~CView();
+    void setProgressBar(int total);
+    void updateProgressBar(int step = 1);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -31,6 +33,8 @@ protected:
 public slots:
     void onInfoReceived(QString key, QVariant value);
     void displayError(int errorId);
+    void onConnectedToHost();
+    void onDisconnectedFromHost();
 
 protected slots:
     // Bouton d'actions
@@ -95,6 +99,7 @@ private:
     CFastSearch* m_fastsearch;
     Ui::CourrierManagerClass *ui;
     CDrawPanelWidget* m_panel;
+    QProgressDialog* m_progress;
     bool m_tableUsed;
     bool m_Copying;
 

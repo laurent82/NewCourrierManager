@@ -6,6 +6,7 @@ class CError
 public:
     CError(){}
     enum Error{
+        ALLFILESSENT,
         NOCONFIGFILE,
         UNKNOWNDIR,
         NOPATIENT,
@@ -14,6 +15,7 @@ public:
         RENAME,
         NOMOREFILE,
         DELETEFILE,
+        NETWORKPROBLEM,
         NOPATIENTLIST,
         NOTCONNECTED
     };
