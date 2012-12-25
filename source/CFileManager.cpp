@@ -105,14 +105,17 @@ bool CFileManager::checkDir()
 
 void CFileManager::onCommandReceived(QString command)
 {
-
+    qDebug() << "FM: command received: " << command;
     if (command.compare("search") == 0) {
         search();
         refreshRemaining();
         // Envoi de la prochaine image.
-        QString fileToLoad = getFile();
-        QImage image = QImage(fileToLoad);
-        emit sendInfo("image", QVariant::fromValue<QImage>(image));
+        int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() - m_i: 0;
+        if (iRemaining > 0) {
+            QString fileToLoad = getFile();
+            QImage image = QImage(fileToLoad);
+            emit sendInfo("image", QVariant::fromValue<QImage>(image));
+        }
     }
 
     // Valider
@@ -128,8 +131,8 @@ void CFileManager::onCommandReceived(QString command)
             emit errorOccur(CError::RENAME);
         }
     }
-    // Update
-    if (command.compare("refresh")) {
+    // Refresh
+    if (command.compare("refresh") == 0) {
         refreshRemaining();
     }
 
@@ -356,7 +359,7 @@ QString CFileManager::constructFileName(int type)
         fileName.append(".jpg");
         break;
     case TYPE_PDF:
-        fileName = patient->getParameter("patient_name").toString();
+        fileName = patient->getParameter("patient_name").toString().toUpper();
         fileName.append("_");
         fileName.append(patient->getParameter("patient_surname").toString().toUpper());
         fileName.append("_$_");
@@ -384,9 +387,9 @@ QString CFileManager::constructFileName(int type)
 void CFileManager::refreshRemaining()
 {
     int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() - m_i: 0;
-    int iSendRemaining = m_sendremaining;
+    m_sendremaining = getFilesToSend().count();
     emit sendInfo("remainingImage", QVariant(iRemaining));
-    emit sendInfo("remainingPDF", QVariant(iSendRemaining));
+    emit sendInfo("remainingPDF", QVariant(m_sendremaining));
 }
 
 
@@ -515,9 +518,9 @@ void CFileManager::prepareNext()
     if ( !fileToLoad.isEmpty() ) {
         QImage image = QImage(fileToLoad);
         emit sendInfo("image", QVariant::fromValue<QImage>(image));
-    } else {
+    } /*else {
         emit errorOccur(CError::NOMOREFILE);
-    }
+    }*/
 }
 
 QStringList CFileManager::searchJPGForPatient(const QString& radicalName)

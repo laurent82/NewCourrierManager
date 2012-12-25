@@ -53,7 +53,8 @@ void CControler::onError(int errorId)
 
 void CControler::onCommandReceived(QString command)
 {
-    if (command.compare("connect", Qt::CaseInsensitive) == 0) {
+    qDebug() << "Command received: " << command;
+     if (command.compare("connect", Qt::CaseInsensitive) == 0) {
         m_network->connectToServer(m_ip);
     }
 
@@ -65,11 +66,15 @@ void CControler::onCommandReceived(QString command)
         QStringList list  = m_fileManager->getFilesToSend();
 
         // Transmettre cette liste au manager réseau
-        if (m_network->isConnected()) {
-            m_view->setProgressBar(list.count());
-            m_network->sendList(list);
-        } else {
-            emit errorOccur(CError::NOTCONNECTED);
+        if (list.count() > 0) {
+            if (m_network->isConnected()) {
+                m_view->setProgressBar(list.count());
+                m_network->sendList(list);
+            } else {
+                emit errorOccur(CError::NOTCONNECTED);
+            }
+        }  else {
+            emit errorOccur(CError::ALLFILESSENT);
         }
     }
 }

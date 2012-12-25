@@ -41,8 +41,6 @@ public:
       */
     void search();
 
-    void getRemaining(int&, int&);
-
     bool deleteFile();
 
     ///////////////////////////////////////
@@ -118,7 +116,7 @@ private:
     QString m_PDFDir;           /// Répertoire où le courrier est conservé en local sous format PDF
 
     int m_i;    // Indice de parcours dans le fichier
-    int m_ic;   // Indice de parcours des fichiers à copier
+    int m_ic;   // Indice de parcours des fichiers à copier (obsolète)
     int m_sendremaining;
     CFastSearch* m_fastsearch;
 
