@@ -81,7 +81,6 @@ bool CFileManager::checkDir()
 {
     if ( m_searchDir.isEmpty() ||
          m_transferDir.isEmpty() ||
-         m_destinationDir.isEmpty() ||
          m_backupDir.isEmpty() ||
          m_PDFDir.isEmpty()) {
         return false;
@@ -89,12 +88,10 @@ bool CFileManager::checkDir()
 
     QDir dirSearch(m_searchDir);
     QDir dirTransfer(m_transferDir);
-    QDir dirDestination(m_destinationDir);
     QDir dirBackup(m_backupDir);
     QDir dirPDF(m_PDFDir);
     if ( !dirSearch.exists() ||
          !dirTransfer.exists() ||
-         !dirDestination.exists() ||
          !dirBackup.exists() ||
          !dirPDF.exists()) {
         return false;

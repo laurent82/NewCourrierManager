@@ -111,7 +111,7 @@ private:
     QStringList* m_lastAdded;   /// Liste des derniers courriers traités
     QString m_searchDir;        /// Répertoire où se trouve le courrier à classer (en JPG)
     QString m_transferDir;      /// Répertoire où le courrier est stocké avant d'etre transféré
-    QString m_destinationDir;   /// Répertoire où le courrier est envoyé
+    QString m_destinationDir;   /// Répertoire où le courrier est envoyé (obsolète)
     QString m_backupDir;        /// Répertoire où le courrier est conservé en local
     QString m_PDFDir;           /// Répertoire où le courrier est conservé en local sous format PDF
 

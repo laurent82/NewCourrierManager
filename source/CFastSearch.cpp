@@ -29,7 +29,7 @@ CFastSearch::~CFastSearch(){
 
 
 void CFastSearch::readPatientList(){
-    ifstream file("./patientlist.txt");
+    ifstream file("/Users/jacqueline/NewCourrierManager/bin/patientlist.txt");
     if (file){
         string line;
         while (!file.eof()){

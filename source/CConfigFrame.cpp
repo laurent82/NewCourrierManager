@@ -3,6 +3,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QApplication>
+#include <QLabel>
+#include <QDir>
 
 // Lecture, écriture de fichier
 // A remplacer avec les fonctions Qt ?
@@ -39,6 +41,8 @@ CConfigFrame::CConfigFrame(QWidget *parent) :
 
     readConfigFile();
 
+    QLabel* currentPath = new QLabel(QDir::currentPath());
+    layout->addRow(QString("Current path:"), currentPath);
     layout->addRow(QString("Search"), m_searchLine);
     layout->addRow(QString("Transfer"), m_transferLine);
     layout->addRow(QString("Destination"), m_destinationLine);

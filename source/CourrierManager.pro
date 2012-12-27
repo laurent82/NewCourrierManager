@@ -6,10 +6,13 @@ MOC_DIR += ../../build/moc/
 UI_DIR = ../../build/ui
 OBJECTS_DIR = ../../build/obj/
 DESTDIR = ../../build/bin/
+
+QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
 #INCLUDEPATH += include/
 #DEPENDPATH += src \
 #        ui
 RC_FILE = mainRes.rc
+#ICON = iconmac.icns
 HEADERS += CView.h \
     CControler.h \
     CDrawPanelWidget.h \

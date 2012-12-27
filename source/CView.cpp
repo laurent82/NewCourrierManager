@@ -20,11 +20,12 @@ CView::CView(QWidget *parent)
       m_progress(0)
 {
     // Ui
-    QApplication::setStyle(new QPlastiqueStyle/*QCleanlooksStyle*/);
+    // QApplication::setStyle(new QPlastiqueStyle/*QCleanlooksStyle*/);
     ui->setupUi(this);
+
     this->setCurrentDate();
     m_panel = new CDrawPanelWidget(0, 0, this);
-   // this->showMaximized();
+    this->showMaximized();
 
     // Ajout des derniers
     m_history = new QStringList;
@@ -33,6 +34,7 @@ CView::CView(QWidget *parent)
 
     // Recherche rapide
     m_fastsearch = new CFastSearch();
+    connect(m_fastsearch, SIGNAL(finished()), this, SLOT(onTableRefresh()));
     m_modele = new QStringListModel(*m_fastsearch->getCurrentList());
     ui->tablePatient->setModel(m_modele);
 
@@ -342,7 +344,6 @@ void CView::on_txtName_textEdited(QString _txt){
     if (ui->cbFastSearch->isChecked()){
         m_fastsearch->setWord(_txt.toUpper());
         m_fastsearch->start();
-        m_modele->setStringList(*m_fastsearch->getCurrentList());
     }
     CPatient::instance()->configure("patient_table", false);
 }
@@ -374,6 +375,11 @@ void CView::onDisconnectedFromHost()
     ui->lblConnected->setStyleSheet("color: red;");
     ui->lblConnected->setText("Non connecté");
     ui->btnConnect->setVisible(true);
+}
+
+void CView::onTableRefresh()
+{
+    m_modele->setStringList(*m_fastsearch->getCurrentList());
 }
 
 

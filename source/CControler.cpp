@@ -4,10 +4,12 @@
 #include "CConfigFrame.h"
 #include "CNetwork.h"
 #include "CError.h"
+#include <QDir>
 
 #include <QApplication>
 CControler::CControler() : QObject()
 {
+    qDebug() << QDir::currentPath();
     m_view = new CView();
     m_fileManager = new CFileManager();
     m_network = new CNetwork();

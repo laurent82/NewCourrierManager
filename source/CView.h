@@ -50,6 +50,8 @@ protected slots:
     void on_txtSurname_textEdited(QString);
     void on_tablePatient_clicked();
 
+    void onTableRefresh();
+
 signals:
     void sendCommand(QString);
     void btnConfigurationClicked();
