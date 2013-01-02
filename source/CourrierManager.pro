@@ -2,17 +2,18 @@ TARGET = NewCourrierManager
 TEMPLATE = app
 CONFIG += qt
 QT += network
-MOC_DIR += ../../build/moc/
-UI_DIR = ../../build/ui
-OBJECTS_DIR = ../../build/obj/
-DESTDIR = ../../build/bin/
+MOC_DIR += /../build/moc/
+UI_DIR = /../build/ui
+OBJECTS_DIR = /../build/obj/
+DESTDIR = /../build/bin/
 
-QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
-#INCLUDEPATH += include/
-#DEPENDPATH += src \
+unix:macx{
+    QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+    #ICON = iconmac.icns
+}
+
 #        ui
 RC_FILE = mainRes.rc
-#ICON = iconmac.icns
 HEADERS += CView.h \
     CControler.h \
     CDrawPanelWidget.h \
