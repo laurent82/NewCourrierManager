@@ -1,10 +1,10 @@
 #include "CConfigFrame.h"
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QApplication>
-#include <QLabel>
-#include <QDir>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+#include <QtCore/QDir>
 
 // Lecture, écriture de fichier
 // A remplacer avec les fonctions Qt ?

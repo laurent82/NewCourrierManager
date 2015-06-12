@@ -1,13 +1,13 @@
+
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QProgressDialog>
+#include <QtCore/QDate>
+
+
 #include "CView.h"
 #include "ui_courriermanager.h"
-
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QDate>
-#include <QMessageBox>
-#include <QProgressDialog>
-#include <QPlastiqueStyle>
-#include <QCleanlooksStyle>
 
 #include "CError.h"
 #include "CPatient.h"

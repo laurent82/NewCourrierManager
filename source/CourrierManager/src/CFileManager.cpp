@@ -1,5 +1,10 @@
 #include "CFileManager.h"
 
+#include <QtPrintSupport/QPrinter>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QProgressDialog>
+
 #include <QDir>
 #include <QFileInfoList>
 #include <QFileInfo>
@@ -7,11 +12,8 @@
 #include <QProcess>
 #include <QDebug>
 #include <QVariant>
-#include <QPrinter>
 #include <QPainter>
 
-#include <QProgressDialog>
-#include <QApplication>
 
 #include "CError.h"
 #include "CDate.h"

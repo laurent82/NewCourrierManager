@@ -1,8 +1,15 @@
 #ifndef CCONFIGFRAME_H
 #define CCONFIGFRAME_H
 
+#define USE_QT5 1
+
+#ifdef USE_QT5
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QLineEdit>
+#else
 #include <QWidget>
 #include <QLineEdit>
+#endif
 
 class CConfigFrame : public QFrame
 {

@@ -1,12 +1,15 @@
+#include <QtWidgets/QApplication>
+#include <QtCore/QDir>
+
 #include "CControler.h"
 #include "CView.h"
 #include "CFileManager.h"
 #include "CConfigFrame.h"
 #include "CNetwork.h"
 #include "CError.h"
-#include <QDir>
 
-#include <QApplication>
+
+
 CControler::CControler() : QObject()
 {
     qDebug() << QDir::currentPath();

@@ -1,13 +1,21 @@
 #ifndef COURRIERMANAGER_H
 #define COURRIERMANAGER_H
 
-#include <QtGui/QDialog>
+#define USE_QT5 1
+
+#ifdef USE_QT5
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QProgressDialog>
+#else
+#include <QDialog>
+#include <QProgressDialog>
+#endif
+
 #include <QResizeEvent>
 
 #include "CDrawPanelWidget.h"
 #include "CFastSearch.h"
 #include <QStringListModel>
-#include <QProgressDialog>
 /**
   * Interface graphique
   *

@@ -1,8 +1,16 @@
 #ifndef CDRAWPANEL_H
 #define CDRAWPANEL_H
 
-#include <QWidget>
+#define USE_QT5 1
+
+#ifdef USE_QT5
+#include <QtWidgets/QtWidgets>
+#include <QtWidgets/QFrame>
+#else
+#include <QtWidgets>
 #include <QFrame>
+#endif
+
 #include <QPainter>
 #include <QEvent>
 #include <QMouseEvent>

@@ -2,10 +2,12 @@ TARGET = NewCourrierManager
 TEMPLATE = app
 CONFIG += qt
 QT += network
-MOC_DIR += /../build/moc/
-UI_DIR = /../build/ui
-OBJECTS_DIR = /../build/obj/
-DESTDIR = /../build/bin/
+QT += printsupport
+QT += widgets
+MOC_DIR += ../build/moc/
+UI_DIR = ../build/ui
+OBJECTS_DIR = ../build/obj/
+DESTDIR = ../build/bin/
 
 unix:macx{
     QMAKE_CXXFLAGS += -mmacosx-version-min=10.7

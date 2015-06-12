@@ -100,7 +100,7 @@ void CServer::sendACK(){
         return;
     }
     QByteArray ba;
-    ba = QString("ACK").toAscii();
+    ba.append("ACK");
     m_socket->write(ba);
 }
 
@@ -109,6 +109,6 @@ void CServer::sendERR(){
         return;
     }
     QByteArray ba;
-    ba = QString("ERR").toAscii();
+    ba.append("ERR");
     m_socket->write(ba);
 }
