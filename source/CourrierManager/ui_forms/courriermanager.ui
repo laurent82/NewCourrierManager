@@ -319,33 +319,14 @@
     <property name="title">
      <string>Derniers courriers classés</string>
     </property>
-    <widget class="QListView" name="tableLast">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>231</width>
-       <height>591</height>
-      </rect>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnBack">
+    <widget class="QTableWidget" name="m_historyTable">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
        <width>231</width>
-       <height>23</height>
+       <height>621</height>
       </rect>
-     </property>
-     <property name="text">
-      <string>Revenir au classement</string>
      </property>
     </widget>
    </widget>

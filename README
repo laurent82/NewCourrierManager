@@ -7,4 +7,6 @@
 													
 Last modifications:
 
+- 22/06/2015: Add undo manager and cancel
+
 - 12/06/2015: Update code to Qt5 and use of Cmake.

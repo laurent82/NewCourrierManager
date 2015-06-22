@@ -6,6 +6,7 @@
 #ifdef USE_QT5
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QProgressDialog>
+#include <QtWidgets/QFormLayout>
 #else
 #include <QDialog>
 #include <QProgressDialog>
@@ -43,10 +44,14 @@ public slots:
     void displayError(int errorId);
     void onConnectedToHost();
     void onDisconnectedFromHost();
+    void onActionUndone(int);
 
 protected slots:
     // Bouton d'actions
     void onButtonClicked(); // Slot activé par un bouton, destiné à envoyer un message au controller.
+
+    // Histoire
+    void onHistoryCancel();
 
     // Boutons pour les dates et raccourcis.
     void on_btnToday_clicked();
@@ -101,11 +106,11 @@ private:
       */
     bool checkFields();
 
+    void removeFromHistory (int id);
+
     QString m_lastDate; /// Dernière date enregistrée.
 
     QStringListModel *m_modele;
-    QStringList* m_history;
-    QStringListModel* m_historyModel;
     CFastSearch* m_fastsearch;
     Ui::CourrierManagerClass *ui;
     CDrawPanelWidget* m_panel;

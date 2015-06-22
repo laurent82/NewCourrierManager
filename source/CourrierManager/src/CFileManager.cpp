@@ -1,7 +1,6 @@
 #include "CFileManager.h"
 
 #include <QtPrintSupport/QPrinter>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QProgressDialog>
 
@@ -14,17 +13,17 @@
 #include <QVariant>
 #include <QPainter>
 
+#include "Action/CActionManager.h"
+#include "Action/CCancelAction.h"
 
 #include "CError.h"
 #include "CDate.h"
 
-// Lecture, écriture de fichier
+// Lecture, ecriture de fichier
 // A remplacer avec les fonctions Qt ?
 #include <fstream>
 #include <string>
 using namespace std;
-
-
 
 CFileManager::CFileManager()
 {}
@@ -33,8 +32,6 @@ CFileManager::~CFileManager(){
     delete m_fileList;
     delete m_fileToCopyList;
 }
-
-
 
 void CFileManager::loadConfigFile(QString& ip)
 {
@@ -119,7 +116,7 @@ void CFileManager::onCommandReceived(QString command)
 
     // Valider
     if (command.compare("validate") == 0) {
-        // Renommer le fichier et ajout potentiel à la table
+        // Renommer le fichier et ajout potentiel ï¿½ la table
         if (renameFile()) {
             this->start();
             emit sendInfo("addToHistory", true);
@@ -162,7 +159,7 @@ void CFileManager::search()
         return;
     }
 
-    // Recherche des fichiers JPG à traiter.
+    // Recherche des fichiers JPG a traiter.
     m_fileList->clear();
     QDir dir(m_searchDir);
     QStringList filters;
@@ -175,7 +172,7 @@ void CFileManager::search()
         m_fileList->append(fileInfo.fileName());
     }
 
-    // Recherche des fichiers PDF à envoyer.
+    // Recherche des fichiers PDF a envoyer.
     dir = QDir(m_transferDir);
     QStringList pdfFilters;
     pdfFilters << "*.pdf" << "*.PDF";
@@ -206,7 +203,7 @@ QStringList CFileManager::getFilesToSend()
 
 void  CFileManager::convertPDFall()
 {
-//    // Récupération de la liste des fichiers à copier
+//    // Rï¿½cupï¿½ration de la liste des fichiers ï¿½ copier
 //    QDir dir(m_backupDir);
 //    QStringList filters;
 //    QStringList* filesToConvert = new QStringList;
@@ -221,7 +218,7 @@ void  CFileManager::convertPDFall()
 //    QProgressDialog pd ("Conversion en cours...", "Annuler", 0, filesToConvert->size(), qApp->activeWindow(), Qt::Dialog);
 //    pd.setAutoClose(false);
 //    for (int i = 0; i < filesToConvert->size(); ++i){
-//        // Extraction des données depuis le nom de fichier
+//        // Extraction des donnï¿½es depuis le nom de fichier
 //        pd.setValue(i);
 //        QString currentFile = filesToConvert->at(i);
 //        CPatient::instance()->configure("patient_date", currentFile.section('_',0,0));
@@ -233,13 +230,12 @@ void  CFileManager::convertPDFall()
 }
 
 bool CFileManager::convertPDF(const QString& pdfName, const QString& radicalName){
-    // Création du nouveau nom
+    // Creation du nouveau nom
     QString strFileNamePDF = pdfName;
     QString strTransferNamePDF;
 
     strTransferNamePDF = m_transferDir + strFileNamePDF;
     strFileNamePDF.prepend(m_PDFDir);
-
     // Suppression de l'ancien fichier PDF s'il existe
     if (QFile::exists( strFileNamePDF)){
         QFile formerPDF(strFileNamePDF);
@@ -283,33 +279,12 @@ bool CFileManager::convertPDF(const QString& pdfName, const QString& radicalName
     file.copy(strTransferNamePDF);
 
     return true;
-
-    //        // Conversion de l'image en PDF
-    //        QString tempName = m_PDFDir + "temp.pdf";
-    //        QProcess::execute(QString("convert.exe %1 %2").arg(_backupFileName).arg(tempName));
-    //        // Renommage du PDF originale
-    //        QString startName = m_PDFDir + "start.pdf";
-    //        QFile file(strFileNamePDF);
-    //        file.rename(startName);
-    //        // Concat à l'aide de PDFTK
-    //        QProcess::execute(QString("pdftk.exe %1 %2 cat output %3").arg(startName).arg(tempName).arg(strFileNamePDF));
-    //        // Suppression des fichiers temporaires
-    //        QFile file2(tempName);
-    //        QFile file3(startName);
-    //        file2.remove();
-    //        file3.remove();
-    //    }
-    //    // Ajout dans le répertoire toTransfer
-    //    // Suppression de l'ancienne version si elle existe
-    //    if (QFile::exists( strTransferNamePDF)){
-    //        QFile file(strTransferNamePDF);
-    //        file.remove();
-
 }
 
 
 bool CFileManager::renameFile()
 {
+
     QString strFileName = constructFileName(TYPE_JPG);
     QString backupFileName = strFileName;
     QString formerFileName = getFile();
@@ -317,12 +292,13 @@ bool CFileManager::renameFile()
         return false;
     }
     QFile file(formerFileName);
-    // Ajout des répertoires:
+    // Ajout des repertoires:
     strFileName.prepend(m_transferDir);   // Ex: toTransfer/NomFichier.jpg
     backupFileName.prepend(m_backupDir);  // Ex: backup/NomFichier.jpg
 
-    // Vérification du nom de fichier dans le cas où il
-    // existerait déjà (erreur d'encodage, reprise...). Modifie le nom sinon.
+
+    // Verification du nom de fichier dans le cas ou il
+    // existerait deja (erreur d'encodage, reprise...). Modifie le nom sinon.
     while (QFile::exists(strFileName) || QFile::exists(backupFileName)) {
         CPatient::instance()->incrementPage();
         strFileName.clear();
@@ -337,6 +313,21 @@ bool CFileManager::renameFile()
          !(file.remove()) ) {
         return false;
     }
+
+    // Undo
+    CCancelAction* action = new CCancelAction();
+
+    QString strFileNamePDF = constructFileName(TYPE_PDF);
+    QString strTransferNamePDF;
+    strTransferNamePDF = m_transferDir + strFileNamePDF;
+    strFileNamePDF.prepend(m_PDFDir);
+
+    action->setPreviousState(formerFileName);
+    action->setCurrentState(backupFileName);
+    action->setPdfName(strTransferNamePDF, 0);
+    action->setPdfName(strFileNamePDF, 1);
+    CActionManager::instance()->push(action);
+
     return true;
 }
 
@@ -423,7 +414,7 @@ void CFileManager::setLastAdded(QStringList* _la){
 //            return false;
 
 //        QFile file(strFileToOpen);
-//        // Création du nouveau nom
+//        // Crï¿½ation du nouveau nom
 //        QString strFileName;
 //        QString backupFileName;
 //        constructFileName(strFileName);
@@ -433,7 +424,7 @@ void CFileManager::setLastAdded(QStringList* _la){
 //        backupFileName = strFileName;
 //        strFileName.prepend(m_transferDir);
 //        backupFileName.prepend(m_backupDir);
-//        // Vérification si le nom de fichier n'existe pas déjà (erreur d'encodage, reprise...). Modifie le nom sinon
+//        // Vï¿½rification si le nom de fichier n'existe pas dï¿½jï¿½ (erreur d'encodage, reprise...). Modifie le nom sinon
 //        while (QFile::exists(strFileName) || QFile::exists(backupFileName)){
 //            m_lastPatient->page++;
 //            strFileName.clear();
@@ -452,9 +443,9 @@ void CFileManager::setLastAdded(QStringList* _la){
 //        QString fullName = m_lastPatient->name;
 //        fullName.append(", ");
 //        fullName.append(m_lastPatient->surname);
-//        if (!_tableUsed){ // Vérification si on ne s'est pas servi de la table
+//        if (!_tableUsed){ // Vï¿½rification si on ne s'est pas servi de la table
 //            //assert(m_fastsearch);
-//            if (!m_fastsearch->isInList(fullName)){ // Vérifie si le patient n'est pas déjà dans la liste, l'ajoute sinon
+//            if (!m_fastsearch->isInList(fullName)){ // Vï¿½rifie si le patient n'est pas dï¿½jï¿½ dans la liste, l'ajoute sinon
 //                ofstream filePatientList("patientlist.txt", ios_base::out | ios_base::app);
 //                if (filePatientList){
 //                    filePatientList << m_lastPatient->name.toLatin1().data() << ";" << m_lastPatient->surname.toLatin1().data() << ";" << endl;
@@ -462,7 +453,7 @@ void CFileManager::setLastAdded(QStringList* _la){
 //                }
 //            }
 //        }
-//        // Ajout dans la liste des derniers ajoutés
+//        // Ajout dans la liste des derniers ajoutï¿½s
 //        //assert(m_lastAdded);
 //        fullName.append(QString(" (%1 - %2)").arg(m_lastPatient->page).arg(m_lastPatient->date));
 //        m_lastAdded->prepend(fullName);

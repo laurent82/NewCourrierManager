@@ -4,6 +4,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QProgressDialog>
 #include <QtCore/QDate>
+#include <QHeaderView>
 
 
 #include "CView.h"
@@ -12,6 +13,9 @@
 #include "CError.h"
 #include "CPatient.h"
 #include "CDate.h"
+
+#include "Action/CActionManager.h"
+#include "Action/CAction.h"
 
 #include <QDebug>
 
@@ -28,9 +32,11 @@ CView::CView(QWidget *parent)
     this->showMaximized();
 
     // Ajout des derniers
-    m_history = new QStringList;
-    m_historyModel = new QStringListModel(*m_history);
-    ui->tableLast->setModel(m_historyModel);
+    ui->m_historyTable->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->m_historyTable->horizontalHeader()->setStretchLastSection(true);
+    ui->m_historyTable->horizontalHeader()->hide();
+    ui->m_historyTable->setColumnCount(3);
+    ui->m_historyTable->verticalHeader()->hide();
 
     // Recherche rapide
     m_fastsearch = new CFastSearch();
@@ -38,8 +44,6 @@ CView::CView(QWidget *parent)
     m_modele = new QStringListModel(*m_fastsearch->getCurrentList());
     ui->tablePatient->setModel(m_modele);
 
-    ui->btnBack->setVisible(false);
-   // ui->btnSend->setVisible(false);
     ui->btnConvert->setVisible(false);
 
     m_tableUsed = false;
@@ -66,6 +70,8 @@ CView::CView(QWidget *parent)
 
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
+
+    connect(CActionManager::instance(), SIGNAL(actionUndone(int)), this, SLOT(onActionUndone(int)));
 }
 
 
@@ -74,8 +80,6 @@ CView::~CView()
     delete ui;
     delete m_fastsearch;
     delete m_modele;
-    delete m_history;
-    delete m_historyModel;
 }
 
 void CView::resizeEvent(QResizeEvent* event){
@@ -99,8 +103,6 @@ void CView::updateProgressBar(int step)
         m_progress->setValue(m_progress->value() + step);
     }
 }
-
-
 
 void CView::onInfoReceived(QString key, QVariant value)
 {
@@ -126,11 +128,20 @@ void CView::onInfoReceived(QString key, QVariant value)
             QString fullName = CPatient::instance()->getParameter("patient_name").toString();
             fullName.append(", ");
             fullName.append(CPatient::instance()->getParameter("patient_surname").toString());
-            fullName.append(QString(" (%1 - %2)").arg(
-                                CPatient::instance()->getParameter("patient_page").toInt()).arg(
-                                CPatient::instance()->getParameter("patient_date").toString()));
-            m_history->prepend(fullName);
-            m_historyModel->setStringList(*m_history);
+            fullName.append(QString(" (%1)").arg(
+                                CPatient::instance()->getParameter("patient_page").toInt()));
+            QPushButton* cancel = new QPushButton("X");
+            cancel->setProperty("cancel", fullName);
+            cancel->setProperty("id", CAction::getLastActionId());
+            cancel->setMaximumWidth(30);
+            connect(cancel, SIGNAL(clicked()), this, SLOT(onHistoryCancel()));
+            ui->m_historyTable->insertRow(0);
+            ui->m_historyTable->setCellWidget(0, 0, cancel);
+            ui->m_historyTable->setItem(0, 1, new QTableWidgetItem(QString::number(CAction::getLastActionId())));
+            ui->m_historyTable->item(0,1)->setTextAlignment(Qt::AlignCenter);
+            ui->m_historyTable->setCellWidget(0, 2, new QLabel(fullName));
+            ui->m_historyTable->resizeColumnsToContents();
+
         }
     }
 }
@@ -238,6 +249,19 @@ bool CView::checkFields()
     }
 }
 
+void CView::removeFromHistory(int id)
+{
+    // Action réussie. Enlever l'élément dans la liste
+    for (int i = 0; i < ui->m_historyTable->rowCount(); ++i) {
+        int currentId = ui->m_historyTable->item(i, 1)->text().toInt();
+        if (currentId == id){
+             ui->m_historyTable->removeRow(i);
+             return;
+        }
+    }
+}
+
+
 void CView::clearFields()
 {
     ui->txtName->setText("");
@@ -295,8 +319,18 @@ void CView::onButtonClicked()
             return;
         }
     }
-
     emit sendCommand(name);
+}
+
+void CView::onHistoryCancel()
+{
+    int currentId = sender()->property("id").toInt();
+    bool actionRep = CActionManager::instance()->cancelActionById(currentId);
+    if (actionRep) {
+        removeFromHistory(currentId);
+        emit sendCommand("search");
+
+    }
 }
 
 void CView::on_btnToday_clicked(){
@@ -375,6 +409,11 @@ void CView::onDisconnectedFromHost()
     ui->lblConnected->setStyleSheet("color: red;");
     ui->lblConnected->setText("Non connecté");
     ui->btnConnect->setVisible(true);
+}
+
+void CView::onActionUndone(int id)
+{
+    removeFromHistory(id);
 }
 
 void CView::onTableRefresh()
