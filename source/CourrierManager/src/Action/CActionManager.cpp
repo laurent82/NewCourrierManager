@@ -30,7 +30,7 @@ CAction* CActionManager::findAction(int id)
 {
     for(int i = 0; i < m_memory.count(); ++i)
     {
-        if (m_memory[i]->getId() == id)
+        if (m_memory[i]->isValid() && m_memory[i]->getId() == id)
         {
             CAction* action = m_memory[i];
             m_memory.remove(i);
@@ -75,7 +75,6 @@ CActionManager::CActionManager() :
 
 void CActionManager::onCancelActionDone(QString name)
 {
-    qDebug() << "Size of the memory: " << m_memory.count();
     // Research all the action with the same PDF
     foreach (CAction* action, m_memory) {
         CCancelAction* cancel = dynamic_cast<CCancelAction*>(action);
