@@ -27,4 +27,5 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(source)
+add_subdirectory(plugins)
 
