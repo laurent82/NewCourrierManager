@@ -90,4 +90,12 @@ void CActionManager::onCancelActionDone(QString name)
             }
         }
     }
+
+    // Clean the vector
+    for (int i = 0; i < m_memory.size(); ++i) {
+        if (m_memory[i]->isValid() == false) {
+            m_memory.remove(i);
+            --i;
+        }
+    }
 }
