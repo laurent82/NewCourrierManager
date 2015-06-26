@@ -1,4 +1,3 @@
-# Enable unit testing.
 set(Build_Courrier_Manager ON CACHE BOOL "Build Courrier Manager")
 if(Build_Courrier_Manager)
 	add_subdirectory(CourrierManager)

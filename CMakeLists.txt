@@ -27,5 +27,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(source)
-add_subdirectory(plugins)
+
+#Include directories
+file(GLOB_RECURSE COURRIER_HEADERS "source/*.h")
+set (COURRIER_INCLUDE_DIRS "")
+
+foreach (_headerFile ${COURRIER_HEADERS})
+    get_filename_component(_dir ${_headerFile} PATH)
+    list (APPEND COURRIER_INCLUDE_DIRS ${_dir})
+endforeach()
+list(REMOVE_DUPLICATES COURRIER_INCLUDE_DIRS)
+
+include_directories(${COURRIER_INCLUDE_DIRS})
+
 

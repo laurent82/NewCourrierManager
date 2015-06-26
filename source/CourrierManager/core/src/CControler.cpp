@@ -16,11 +16,14 @@ CControler::CControler() : QObject()
     m_view = new CView();
     m_fileManager = new CFileManager();
     m_network = new CNetwork();
+    m_ocrHandler = 0;
 
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
     connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), m_view, SLOT(onInfoReceived(QString, QVariant)));
+    connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), this, SLOT(onInfoReceived(QString, QVariant)));
+
     connect(this, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
 
     connect(m_network, SIGNAL(connectToHost()), m_view, SLOT(onConnectedToHost()));
@@ -103,4 +106,16 @@ void CControler::onAllFilesSent()
 {
     m_fileManager->onCommandReceived("refresh");
     m_view->displayError(CError::ALLFILESSENT);
+}
+
+void CControler::onInfoReceived(QString key, QVariant value)
+{
+    /*
+    if (key == "image") {
+        if (m_ocrHandler) {
+            m_ocrHandler->setInput(value.value<QImage>());
+
+        }
+    }
+    */
 }

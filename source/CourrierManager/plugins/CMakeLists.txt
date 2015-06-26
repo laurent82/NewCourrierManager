@@ -1,3 +1,5 @@
+add_subdirectory(common)
+
 SET(CM_WITH_HELLO OFF CACHE BOOL "Build Hello plugin")
 SET(CM_WITH_CLEANLINE OFF CACHE BOOL "Build clean line plugin")
 SET(CM_WITH_OCR OFF CACHE BOOL "Build ocr plugin")

@@ -1,36 +1,24 @@
-# ------------------------------------------------------------------------------- # 
+# ------------------------------------------------------------------------------- #
 #
-#         ___                  _           __  __                             	  
-#        / __|___ _  _ _ _ _ _(_)___ _ _  |  \/  |__ _ _ _  __ _ __ _ ___ _ _ 	  
-#       | (__/ _ \ || | '_| '_| / -_) '_| | |\/| / _` | ' \/ _` / _` / -_) '_| 	  
-#        \___\___/\_,_|_| |_| |_\___|_|   |_|  |_\__,_|_||_\__,_\__, \___|_|  	  
+#         ___                  _           __  __
+#        / __|___ _  _ _ _ _ _(_)___ _ _  |  \/  |__ _ _ _  __ _ __ _ ___ _ _
+#       | (__/ _ \ || | '_| '_| / -_) '_| | |\/| / _` | ' \/ _` / _` / -_) '_|
+#        \___\___/\_,_|_| |_| |_\___|_|   |_|  |_\__,_|_||_\__,_\__, \___|_|
 #                                                               |___/
-#										  
-#                               Author: Laurent Engels                  	  
-#						  
+#
+#                               Author: Laurent Engels
+#
 # ------------------------------------------------------------------------------- #
 
-message (STATUS "Generation of Courrier Manager")
+message(STATUS "[PROJECT] Generation of Courrier Manager")
 
-# Definition of CourrierManager
-QT5_WRAP_UI(UIS_HDRS
-    ui_forms/courriermanager.ui
-)
+set(CORE_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
+set(COMMONPLUGIN_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/plugins/common/include")
 
-file(
-	GLOB_RECURSE
-	manager_sources
-	*
-)
+include_directories(${CORE_INCLUDE})
+include_directories(${COMMONPLUGIN_INCLUDE})
 
-include_directories( include )
+add_subdirectory(core)
+add_subdirectory(plugins)
 
-add_executable(
-	CourrierManager
-	${manager_sources}
-	${UIS_HDRS}
-)
-target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport)
-
-# End of CourrierManager
-# ----------------------------------------------------------------------------
+message(STATUS "[/PROJECT] End of Courrier Manager")

@@ -27,7 +27,6 @@ CFastSearch::~CFastSearch(){
     delete m_currentList;
 }
 
-
 void CFastSearch::readPatientList(){
     ifstream file("/Users/jacqueline/NewCourrierManager/bin/patientlist.txt");
     if (file){

@@ -4,6 +4,7 @@
 class CView;
 class CFileManager;
 class CNetwork;
+class COcrHandler;
 
 #include <QObject>
 
@@ -22,6 +23,7 @@ public slots:
     void showConfigDialog();
     void onFileSent();
     void onAllFilesSent();
+    void onInfoReceived(QString key, QVariant value);
 
 signals:
     void errorOccur(int);
@@ -31,5 +33,6 @@ private:
     CView* m_view;
     CFileManager* m_fileManager;
     CNetwork* m_network;
+    COcrHandler* m_ocrHandler;
 };
     #endif
