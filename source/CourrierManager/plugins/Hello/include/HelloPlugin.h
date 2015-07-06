@@ -5,7 +5,7 @@
 #include <QtPlugin>
 #include <CAbstractPlugin.h>
 
-class HelloPlugin : public QObject
+class HelloPlugin : public CAbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.courriermanager.HelloPlugin")
@@ -13,9 +13,7 @@ class HelloPlugin : public QObject
 
 public:
     HelloPlugin();
-
     virtual CAbstractFilter *createFilter();
-
 };
 
 #endif

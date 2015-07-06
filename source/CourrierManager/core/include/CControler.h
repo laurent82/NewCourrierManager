@@ -4,9 +4,10 @@
 class CView;
 class CFileManager;
 class CNetwork;
-class COcrHandler;
+class CAbstractFilter;
 
 #include <QObject>
+#include <QList>
 
 class CControler : public QObject
 {
@@ -33,6 +34,7 @@ private:
     CView* m_view;
     CFileManager* m_fileManager;
     CNetwork* m_network;
-    COcrHandler* m_ocrHandler;
+    QList<CAbstractFilter*> m_filterList;
+
 };
     #endif

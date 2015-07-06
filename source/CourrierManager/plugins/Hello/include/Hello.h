@@ -6,7 +6,7 @@
 class Hello : public CAbstractFilter
 {
 public:
-    Hello();
+    Hello(const QString& title);
     virtual void execute();
 
 private:

@@ -3,8 +3,8 @@
 #include <iostream>
 using namespace std;
 
-Hello::Hello() :
-    CAbstractFilter()
+Hello::Hello(const QString &title) :
+    CAbstractFilter(title)
 {
 }
 

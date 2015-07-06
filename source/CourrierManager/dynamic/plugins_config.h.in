@@ -1,0 +1,5 @@
+#define ON 1
+#define OFF 0
+#define CM_WITH_HELLO @CM_WITH_HELLO@
+#define CM_WITH_CLEARLINE @CM_WITH_CLEANLINE@
+#define CM_WITH_OCR @CM_WITH_OCR@

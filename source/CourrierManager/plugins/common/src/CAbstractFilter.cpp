@@ -1,8 +1,10 @@
 #include "CAbstractFilter.h"
 
-CAbstractFilter::CAbstractFilter()
+CAbstractFilter::CAbstractFilter(const QString name) :
+    m_active(true),
+    m_name(name),
+    m_outputCreated(false)
 {
-
 }
 
 void CAbstractFilter::setInput(const QVariant &input)
@@ -18,6 +20,21 @@ void CAbstractFilter::setInput(const QVariant &input, const QString &key)
 QVariant CAbstractFilter::getOutput() const
 {
     return m_output;
+}
+
+bool CAbstractFilter::isActive() const
+{
+    return m_active;
+}
+
+void CAbstractFilter::setActive(bool active)
+{
+    m_active = active;
+}
+
+bool CAbstractFilter::isOutputCreated() const
+{
+    return m_outputCreated;
 }
 
 QVariant CAbstractFilter::getInput() const

@@ -8,7 +8,8 @@
 #include "CNetwork.h"
 #include "CError.h"
 
-
+#include <CPluginLoader.h>
+#include <CAbstractFilter.h>
 
 CControler::CControler() : QObject()
 {
@@ -16,7 +17,6 @@ CControler::CControler() : QObject()
     m_view = new CView();
     m_fileManager = new CFileManager();
     m_network = new CNetwork();
-    m_ocrHandler = 0;
 
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
@@ -34,6 +34,11 @@ CControler::CControler() : QObject()
 
     // Gestion des erreurs:
     connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
+
+    // Gestion des plugins
+    CPluginLoader* loader = new CPluginLoader;
+    m_filterList = loader->getList();
+    delete loader;
 
     m_fileManager->loadConfigFile(m_ip);
     m_network->connectToServer(m_ip);
@@ -110,12 +115,16 @@ void CControler::onAllFilesSent()
 
 void CControler::onInfoReceived(QString key, QVariant value)
 {
-    /*
     if (key == "image") {
-        if (m_ocrHandler) {
-            m_ocrHandler->setInput(value.value<QImage>());
-
+        QVariant target = value;
+        foreach(CAbstractFilter* filter, m_filterList){
+            if (filter->isActive()) {
+                filter->setInput(target);
+                filter->execute();
+                if (filter->isOutputCreated()) {
+                    target = filter->getOutput();
+                }
+            }
         }
     }
-    */
 }
