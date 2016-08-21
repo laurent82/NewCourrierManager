@@ -28,7 +28,8 @@ public:
     // Configuration
     ///////////////////////////////////////
 
-    void loadConfigFile(QString &ip);
+ //   void loadConfigFile(QString &ip); // DEPRECATED
+    void loadSettings();
 
     ///////////////////////////////////////
     // Gestion courrier entrant

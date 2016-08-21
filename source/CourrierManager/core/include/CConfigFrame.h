@@ -11,20 +11,18 @@
 #include <QLineEdit>
 #endif
 
-class CConfigFrame : public QFrame
+#include <QDialog>
+
+class CConfigFrame : public QDialog
 {
     Q_OBJECT
 public:
-    static CConfigFrame* instance();
-signals:
-    
-protected:
-    explicit CConfigFrame(QWidget *parent = 0);
+  CConfigFrame(QWidget *parent = 0);
 
 public slots:
     void onValidateClicked();
 private:
-    void readConfigFile();
+    void readSettings();
 
     QLineEdit* m_searchLine;
     QLineEdit* m_transferLine;

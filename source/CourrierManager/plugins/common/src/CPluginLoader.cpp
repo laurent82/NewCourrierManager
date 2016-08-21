@@ -1,7 +1,7 @@
 #include "CPluginLoader.h"
+/*
 
 #include "CAbstractFilter.h"
-#i
 #include <plugins_config.h>
 
 #if CM_WITH_HELLO
@@ -51,5 +51,5 @@ void CPluginLoader::init()
     m_list.append(ocrPlugin->createFilter());
     delete ocrPlugin;
 #endif
-
 }
+*/

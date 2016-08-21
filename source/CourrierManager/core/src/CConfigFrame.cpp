@@ -5,26 +5,13 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 #include <QtCore/QDir>
+#include <QSettings>
 
-// Lecture, écriture de fichier
-// A remplacer avec les fonctions Qt ?
-#include <fstream>
-#include <string>
+
 using namespace std;
 
-CConfigFrame* CConfigFrame::m_instance = 0;
-
-CConfigFrame* CConfigFrame::instance()
-{
-    if (!m_instance) {
-        m_instance = new CConfigFrame(qApp->activeWindow());
-    }
-    return m_instance;
-}
-
-
 CConfigFrame::CConfigFrame(QWidget *parent) :
-    QFrame(parent)
+    QDialog(parent)
 {
     QFormLayout* layout = new QFormLayout;
     setLayout(layout);
@@ -39,7 +26,7 @@ CConfigFrame::CConfigFrame(QWidget *parent) :
     QPushButton* closeButton = new QPushButton("Valider");
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onValidateClicked()));
 
-    readConfigFile();
+    readSettings();
 
     QLabel* currentPath = new QLabel(QDir::currentPath());
     layout->addRow(QString("Current path:"), currentPath);
@@ -56,35 +43,26 @@ CConfigFrame::CConfigFrame(QWidget *parent) :
 
 void CConfigFrame::onValidateClicked()
 {
-    ofstream file("config.txt");
-    file << m_searchLine->text().toStdString() << endl;
-    file << m_transferLine->text().toStdString() << endl;
-    file << m_destinationLine->text().toStdString() << endl;
-    file << m_backupLine->text().toStdString() << endl;
-    file << m_PDFLine->text().toStdString() << endl;
-    file << m_IPLine->text().toStdString() << endl;
+    QSettings settings;
+    settings.setValue( "searchDir", m_searchLine->text());
+    settings.setValue( "transferDir", m_transferLine->text());
+    settings.setValue( "destinationDir", m_destinationLine->text());
+    settings.setValue( "backupDir", m_backupLine->text());
+    settings.setValue( "PDFDir", m_PDFLine->text());
+    settings.setValue( "ipServer", m_IPLine->text());
 
-    file.close();
     close();
 }
 
-void CConfigFrame::readConfigFile()
+void CConfigFrame::readSettings()
 {
-    // Lecture des paramètres
-    ifstream file("config.txt");
-    if (file) {
-        string strSearch, strTransfert, strDestination, strBackup, strPDF, strIP;
-        getline(file, strSearch);
-        getline(file, strTransfert);
-        getline(file, strDestination);
-        getline(file, strBackup);
-        getline(file, strPDF);
-        getline(file, strIP);
-        m_searchLine->setText(QString(strSearch.c_str()));
-        m_transferLine->setText(QString(strTransfert.c_str()));
-        m_destinationLine->setText(QString(strDestination.c_str()));
-        m_backupLine->setText(QString(strBackup.c_str()));
-        m_PDFLine->setText(QString(strPDF.c_str()));
-        m_IPLine->setText(QString(strIP.c_str()));
-    }
+    QSettings settings;
+
+    m_searchLine->setText( settings.value( "searchDir" ).toString() );
+    m_transferLine->setText( settings.value( "transferDir" ).toString() );
+    m_destinationLine->setText( settings.value( "destinationDir" ).toString() );
+    m_backupLine->setText( settings.value( "backupDir" ).toString() );
+    m_PDFLine->setText( settings.value( "PDFDir" ).toString() );
+    m_IPLine->setText( settings.value( "ipServer" ).toString() );
+
 }

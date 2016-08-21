@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QVariant>
 #include <QPainter>
+#include <QSettings>
 
 #include "Action/CActionManager.h"
 #include "Action/CCancelAction.h"
@@ -19,62 +20,49 @@
 #include "CError.h"
 #include "CDate.h"
 
-// Lecture, ecriture de fichier
-// A remplacer avec les fonctions Qt ?
-#include <fstream>
-#include <string>
 using namespace std;
 
 CFileManager::CFileManager()
-{}
+{
+    m_fileList = new QStringList();
+    m_fileToCopyList = 0;
+    m_sendremaining = 0;
+    loadSettings();
+}
 
 CFileManager::~CFileManager(){
     delete m_fileList;
     delete m_fileToCopyList;
 }
 
-void CFileManager::loadConfigFile(QString& ip)
-{
-    // Lecture des paramètres
-    ifstream file("config.txt");
-    if (file) {
-    string strSearch, strTransfert, strDestination, strBackup, strPDF, strIP;
-    getline(file, strSearch);
-    getline(file, strTransfert);
-    getline(file, strDestination);
-    getline(file, strBackup);
-    getline(file, strPDF);
-    getline(file, strIP);
-    m_fileList = new QStringList();
-    m_fileToCopyList = 0;
-    m_searchDir = QString(strSearch.c_str());
-    m_transferDir = QString(strTransfert.c_str());
-    m_destinationDir = QString(strDestination.c_str());
-    m_backupDir = QString(strBackup.c_str());
-    m_PDFDir = QString(strPDF.c_str());
-    ip = QString(strIP.c_str());
 
-    if (m_searchDir.right(1).compare("/") != 0) {
-        m_searchDir.append('/');
-    }
-    if (m_transferDir.right(1).compare("/") != 0) {
-        m_transferDir.append('/');
-    }
-    if (m_destinationDir.right(1).compare("/") != 0) {
-        m_destinationDir.append('/');
-    }
-    if (m_backupDir.right(1).compare("/") != 0) {
-        m_backupDir.append('/');
-    }
-    if (m_PDFDir.right(1).compare("/") != 0) {
-        m_PDFDir.append('/');
-    }
-    m_sendremaining = 0;
-    }
-    else {
+void CFileManager::loadSettings()
+{
+    QSettings settings;
+    if ( settings.status() != QSettings::NoError ||
+         !settings.contains("searchDir")   ||
+         !settings.contains("transferDir") ||
+         !settings.contains("destinationDir") ||
+         !settings.contains("backupDir") ||
+         !settings.contains("PDFDir") )
+    {
         emit errorOccur(CError::NOCONFIGFILE);
+        return;
     }
+
+    m_searchDir = settings.value("searchDir").toString();
+    m_transferDir = settings.value("searchDir").toString();
+    m_destinationDir = settings.value("destinationDir").toString();
+    m_backupDir = settings.value("backupDir").toString();
+    m_PDFDir = settings.value("PDFDir").toString();
+
+    m_searchDir.append('/');
+    m_transferDir.append('/');
+    m_destinationDir.append('/');
+    m_backupDir.append('/');
+    m_PDFDir.append('/');
 }
+
 
 bool CFileManager::checkDir()
 {

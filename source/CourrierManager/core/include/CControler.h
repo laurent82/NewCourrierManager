@@ -8,6 +8,7 @@ class CAbstractFilter;
 
 #include <QObject>
 #include <QList>
+#include <QSettings>
 
 class CControler : public QObject
 {
@@ -30,6 +31,7 @@ signals:
     void errorOccur(int);
 
 private:
+
     QString m_ip;
     CView* m_view;
     CFileManager* m_fileManager;

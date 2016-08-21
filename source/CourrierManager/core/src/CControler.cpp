@@ -8,12 +8,11 @@
 #include "CNetwork.h"
 #include "CError.h"
 
-#include <CPluginLoader.h>
-#include <CAbstractFilter.h>
+// #include <CPluginLoader.h>
+// #include <CAbstractFilter.h>
 
 CControler::CControler() : QObject()
 {
-    qDebug() << QDir::currentPath();
     m_view = new CView();
     m_fileManager = new CFileManager();
     m_network = new CNetwork();
@@ -35,12 +34,14 @@ CControler::CControler() : QObject()
     // Gestion des erreurs:
     connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
 
-    // Gestion des plugins
-    CPluginLoader* loader = new CPluginLoader;
-    m_filterList = loader->getList();
-    delete loader;
+//    // Gestion des plugins
+//    CPluginLoader* loader = new CPluginLoader;
+//    m_filterList = loader->getList();
+//    delete loader;
 
-    m_fileManager->loadConfigFile(m_ip);
+//    m_fileManager->loadConfigFile(m_ip);
+    QSettings settings;
+    m_ip = settings.value("serverIP").toString();
     m_network->connectToServer(m_ip);
     m_view->show();
 }
@@ -66,7 +67,6 @@ void CControler::onError(int errorId)
 
 void CControler::onCommandReceived(QString command)
 {
-    qDebug() << "Command received: " << command;
      if (command.compare("connect", Qt::CaseInsensitive) == 0) {
         m_network->connectToServer(m_ip);
     }
@@ -99,7 +99,8 @@ void CControler::onCriticalError()
 
 void CControler::showConfigDialog()
 {
-    CConfigFrame::instance()->show();
+    CConfigFrame config;
+    config.exec();
 }
 
 void CControler::onFileSent()
@@ -115,16 +116,16 @@ void CControler::onAllFilesSent()
 
 void CControler::onInfoReceived(QString key, QVariant value)
 {
-    if (key == "image") {
-        QVariant target = value;
-        foreach(CAbstractFilter* filter, m_filterList){
-            if (filter->isActive()) {
-                filter->setInput(target);
-                filter->execute();
-                if (filter->isOutputCreated()) {
-                    target = filter->getOutput();
-                }
-            }
-        }
-    }
+//    if (key == "image") {
+//        QVariant target = value;
+//        foreach(CAbstractFilter* filter, m_filterList){
+//            if (filter->isActive()) {
+//                filter->setInput(target);
+//                filter->execute();
+//                if (filter->isOutputCreated()) {
+//                    target = filter->getOutput();
+//                }
+//            }
+//        }
+//    }
 }
