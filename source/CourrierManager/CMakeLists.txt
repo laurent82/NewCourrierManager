@@ -19,7 +19,7 @@ message(STATUS "[PROJECT] Generation of Courrier Manager")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-set(CORE_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
+set(PROGRAM_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/program/include")
 set(COMMONPLUGIN_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/plugins/common/include")
 
 message(STATUS "[DYNAMIC] Generate dynamic files")
@@ -29,11 +29,11 @@ configure_file( dynamic/plugins_config.h.in
                 ${GENERATED_DIR}/plugins_config.h )
 
 
-include_directories(${CORE_INCLUDE})
+include_directories(${PROGRAM_INCLUDE})
 include_directories(${COMMONPLUGIN_INCLUDE})
 include_directories(${GENERATED_DIR})
 
-add_subdirectory(core)
+add_subdirectory(program)
 add_subdirectory(plugins)
 
 message(STATUS "[/PROJECT] End of Courrier Manager")

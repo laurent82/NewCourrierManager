@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(CourrierSuite)
 
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Release Debug RelWithDebInfo)
+#set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Release Debug RelWithDebInfo)
 
 #Output path
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})

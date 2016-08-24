@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+class QRadioButton;
+
 class CConfigFrame : public QDialog
 {
     Q_OBJECT
@@ -21,7 +23,11 @@ public:
 
 public slots:
     void onValidateClicked();
+	void onNetworkMethodChanged();
 private:
+	QWidget* createDirSettings();
+	QWidget* createNetworkSettings();
+
     void readSettings();
 
     QLineEdit* m_searchLine;
@@ -30,6 +36,11 @@ private:
     QLineEdit* m_backupLine;
     QLineEdit* m_PDFLine;
     QLineEdit* m_IPLine;
+	QRadioButton * m_rbServer;
+	QRadioButton * m_rbFTP;
+	QLineEdit* m_loginFTP;
+	QLineEdit* m_passwordFTP;
+	QLineEdit* m_folderFTP;
 
     static CConfigFrame* m_instance;
 };
