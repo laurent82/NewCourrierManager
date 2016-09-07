@@ -20,7 +20,6 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 # Definition of Qt
 FIND_PACKAGE(Qt5 COMPONENTS Core Widgets Network PrintSupport)
-
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
@@ -48,6 +47,9 @@ set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/INSTALLER")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "CourrierSuite")
-#set(CPACK_INSTALLED_DIRECTORIES "backup")
+
+# Special values for NSIS
+set (CPACK_NSIS_DISPLAY_NAME "Courrier Suite")
+set (CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/GlobalResources/main_icon.ico")
 INCLUDE(CPack)
 
