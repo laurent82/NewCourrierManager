@@ -31,6 +31,7 @@ signals:
     void errorOccur(int);
 
 private:
+	void initNetwork();
 
     QString m_ip;
     CView* m_view;

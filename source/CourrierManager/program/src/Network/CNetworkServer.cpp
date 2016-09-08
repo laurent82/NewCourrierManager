@@ -1,22 +1,22 @@
-#include "CNetwork.h"
+#include "Network/CNetworkServer.h"
 
 #include <QDataStream>
 #include <QFile>
 #include <QBuffer>
 #include "CError.h"
 
-CNetwork::CNetwork():
+CNetworkServer::CNetworkServer() :
     m_iter(0)
 {
 
 }
 
-CNetwork::~CNetwork()
+CNetworkServer::~CNetworkServer()
 {
     m_socket.close();
 }
 
-void CNetwork::connectToServer(const QString& strIp)
+void CNetworkServer::connectToServer(const QString& strIp)
 {
     m_socket.connectToHost(strIp, 4500);
     connect(&m_socket, SIGNAL(connected()), this, SIGNAL(connectToHost()));
@@ -24,12 +24,12 @@ void CNetwork::connectToServer(const QString& strIp)
     connect(&m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
-bool CNetwork::isConnected()
+bool CNetworkServer::isConnected()
 {
     return m_socket.isOpen();
 }
 
-void CNetwork::sendList(const QStringList& list)
+void CNetworkServer::sendList(const QStringList& list)
 {
     m_list = list;
     m_iter = 0;
@@ -41,7 +41,7 @@ void CNetwork::sendList(const QStringList& list)
 }
 
 
-void CNetwork::sendFile(const QString& strFilePath)
+void CNetworkServer::sendFile(const QString& strFilePath)
 {
     QFile fileToSend(strFilePath);
     fileToSend.open(QIODevice::ReadOnly);
@@ -56,9 +56,11 @@ void CNetwork::sendFile(const QString& strFilePath)
     m_socket.write(ba);
 }
 
-void CNetwork::onReadyRead()
+void CNetworkServer::onReadyRead()
 {
-    int size =  m_socket.bytesAvailable();
+  /*  
+	// FIXME
+	int size =  m_socket.bytesAvailable();
     QByteArray ba = m_socket.read(size);
     QString msg = ba.data();
     if (msg.contains("ACK")) {
@@ -74,9 +76,10 @@ void CNetwork::onReadyRead()
     } else if (msg.contains("ERR")) {
         emit errorOccur(CError::NETWORKPROBLEM);
     }
+	*/
 }
 
-QString  CNetwork::getNextFile()
+QString  CNetworkServer::getNextFile()
 {
     ++m_iter;
     if (m_iter < m_list.count()) {

@@ -5,8 +5,11 @@
 #include "CView.h"
 #include "CFileManager.h"
 #include "CConfigFrame.h"
-#include "CNetwork.h"
+#include "Network/CNetwork.h"
 #include "CError.h"
+
+#include "Network/CNetworkFTP.h"
+#include "Network/CNetworkServer.h"
 
 // #include <CPluginLoader.h>
 // #include <CAbstractFilter.h>
@@ -15,7 +18,7 @@ CControler::CControler() : QObject()
 {
     m_view = new CView();
     m_fileManager = new CFileManager();
-    m_network = new CNetwork();
+  
 
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
@@ -24,12 +27,7 @@ CControler::CControler() : QObject()
     connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), this, SLOT(onInfoReceived(QString, QVariant)));
 
     connect(this, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
-
-    connect(m_network, SIGNAL(connectToHost()), m_view, SLOT(onConnectedToHost()));
-    connect(m_network, SIGNAL(disconnectedFromHost()), m_view, SLOT(onDisconnectedFromHost()));
-    connect(m_network, SIGNAL(allFilesSent()), this, SLOT(onAllFilesSent()));
-    connect(m_network, SIGNAL(fileSent()), this, SLOT(onFileSent()));
-    connect(m_network, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
+	 
 
     // Gestion des erreurs:
     connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
@@ -38,11 +36,7 @@ CControler::CControler() : QObject()
 //    CPluginLoader* loader = new CPluginLoader;
 //    m_filterList = loader->getList();
 //    delete loader;
-
-//    m_fileManager->loadConfigFile(m_ip);
-    QSettings settings;
-    m_ip = settings.value("serverIP").toString();
-    m_network->connectToServer(m_ip);
+   
     m_view->show();
 }
 
@@ -128,4 +122,30 @@ void CControler::onInfoReceived(QString key, QVariant value)
 //            }
 //        }
 //    }
+}
+
+void CControler::initNetwork()
+{
+	QSettings settings;
+	QString network_method = settings.value("network_method").toString();
+	if (network_method.compare("ftp", Qt::CaseInsensitive) == 0 )
+	{
+		m_network = new CNetworkFTP();
+
+	}
+	else if ( network_method.compare("server", Qt::CaseInsensitive) == 0 )
+	{
+		m_network = new CNetworkServer();
+
+	}
+
+	m_ip = settings.value("serverIP").toString();
+	m_network->connectToServer(m_ip);
+
+	// Connect
+	connect(m_network, SIGNAL(connectToHost()), m_view, SLOT(onConnectedToHost()));
+	connect(m_network, SIGNAL(disconnectedFromHost()), m_view, SLOT(onDisconnectedFromHost()));
+	connect(m_network, SIGNAL(allFilesSent()), this, SLOT(onAllFilesSent()));
+	connect(m_network, SIGNAL(fileSent()), this, SLOT(onFileSent()));
+	connect(m_network, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
 }
