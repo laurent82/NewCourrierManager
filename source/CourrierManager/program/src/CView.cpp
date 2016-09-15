@@ -24,7 +24,6 @@ CView::CView(QWidget *parent)
       m_progress(0)
 {
     // Ui
-    // QApplication::setStyle(new QPlastiqueStyle/*QCleanlooksStyle*/);
     ui->setupUi(this);
 
     this->setCurrentDate();
@@ -57,6 +56,15 @@ CView::CView(QWidget *parent)
     ui->btnNext->setProperty("commandName", "skip");
     ui->btnDelete->setProperty("commandName", "delete");
     ui->btnConnect->setProperty("commandName", "connect");
+
+    ui->btnLastDate->setProperty("type", "small" );
+    ui->btnToday->setProperty("type", "small");
+    
+    style()->unpolish( ui->btnToday );
+    style()->polish(ui->btnToday);
+
+    style()->unpolish(ui->btnLastDate);
+    style()->polish(ui->btnLastDate);
 
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
@@ -209,7 +217,11 @@ void CView::displayError(int errorId)
                               tr("Une erreur s'est produite durant le transfert."),
                               QMessageBox::Ok);
     break;
-
+    case CError::NOCONFIGUREDNETWORK:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Le réseau n'a pas été configuré."),
+            QMessageBox::Ok);
+        break;
     default:
         QMessageBox::information(this, tr("Courrier"),
                               tr("Erreur non répertoriée."),

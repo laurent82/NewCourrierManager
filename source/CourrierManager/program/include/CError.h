@@ -17,7 +17,8 @@ public:
         DELETEFILE,
         NETWORKPROBLEM,
         NOPATIENTLIST,
-        NOTCONNECTED
+        NOTCONNECTED,
+        NOCONFIGUREDNETWORK
     };
 };
 

@@ -14,12 +14,14 @@
 // #include <CPluginLoader.h>
 // #include <CAbstractFilter.h>
 
-CControler::CControler() : QObject()
+CControler::CControler() 
+    : QObject()
+    , m_network( nullptr )
+  
 {
     m_view = new CView();
     m_fileManager = new CFileManager();
   
-
     connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
     connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
@@ -28,7 +30,6 @@ CControler::CControler() : QObject()
 
     connect(this, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
 	 
-
     // Gestion des erreurs:
     connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
 
@@ -62,7 +63,13 @@ void CControler::onError(int errorId)
 void CControler::onCommandReceived(QString command)
 {
      if (command.compare("connect", Qt::CaseInsensitive) == 0) {
-        m_network->connectToServer(m_ip);
+         if ( m_network != nullptr ) {
+            m_network->connectToServer(m_ip);
+         }
+         else {
+            onError(CError::NOCONFIGUREDNETWORK);
+         }
+         return;
     }
 
     if (command.compare("send", Qt::CaseInsensitive) == 0) {

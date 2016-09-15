@@ -1,3 +1,13 @@
+QDialog{
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #cbd6ec, stop: 1 #e5e9f3);
+}
+QLineEdit{
+    border: 1px solid #92a8d2;
+    border-radius: 2px;
+}
+
+
 QPushButton{
     border: 1px solid #92a8d2;
     background-color: #FFFFFF;
@@ -5,6 +15,10 @@ QPushButton{
 }
 
 QPushButton::hover{
+    background-color: #e5e9f3;
+}
+
+QPushButton::pressed{
     background-color: #cbd6ec;
 }
 
@@ -15,4 +29,34 @@ QPushButton::disabled{
 
 QPushButton[type="small"]{
     font: 10px;
+}
+
+QGroupBox {
+    background-color: #F0F0F0;
+    border: 1px solid #92a8d2;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    background: transparent;
+    color: #434d60;
+    padding-top: 2px;
+    padding-left: 2px;
+}
+
+CDrawPanelWidget {
+    border: 2px solid #92a8d2;
+}
+
+#btnConfiguration{
+    background-image: url(":/configure.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#toolBar {
+    border: 2px solid #92a8d2;
+    border-radius: 3px;
 }

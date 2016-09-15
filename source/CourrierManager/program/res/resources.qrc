@@ -1,5 +1,6 @@
 <RCC>
     <qresource>
         <file alias="stylesheet.qss">qss/stylesheet.qss</file>
+        <file alias="configure.png">icons/configure.png</file>
     </qresource>
 </RCC>
