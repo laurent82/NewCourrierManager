@@ -2,10 +2,13 @@
 #define CNETWORKFTP_H
 
 #include "CNetwork.h"
+
 #include <QString>
 #include <QStringList>
-#include <QtNetwork/QTcpSocket>
 
+#include <memory>
+
+class QNetworkAccessManager;
 
 class CNetworkFTP : public CNetwork
 {
@@ -20,6 +23,9 @@ public:
 
 protected:
 	virtual QString getNextFile();
+
+private:
+    std::unique_ptr<QNetworkAccessManager> m_access;
 
 };
 

@@ -1,15 +1,41 @@
 #include "Network/CNetworkFTP.h"
 
-#include <QDataStream>
-#include <QFile>
-#include <QBuffer>
+// #include <QDataStream>
+// #include <QFile>
+// #include <QBuffer>
+
 #include "CError.h"
+
+#include <QNetworkAccessManager>
+#include <QUrl>
 
 CNetworkFTP::CNetworkFTP():
 	CNetwork()/*,
     m_iter(0)*/
 {
 
+    m_access.reset(new QNetworkAccessManager());
+
+    QSettings settings;
+    QString url_adress;
+    QString ip_server = settings.value("ipServer").toString();
+    QString url_folder = settings.value("folderFTP").toString();
+    QString url_loginFTP = settings.value("loginFTP").toString();
+    QString url_passwordFTP = settings.value("passwordFTP").toString();
+   
+    QString url_adress = QString("ftp://%1/%2");
+    QUrl url ( url_adress );
+    url.setUserName( url_loginFTP );
+    url.setPassword( url_passwordFTP );
+ 
+//    QFile data( filename )
+//    if (data->open(QIODevice::ReadOnly)) {
+//         reply = m_access.put(QNetworkRequest(url), data);
+//         connect(reply, SIGNAL(uploadProgress(qint64, qint64)), SLOT(uploadProgress(qint64, qint64)));
+//         connect(reply, SIGNAL(finished()), SLOT(uploadDone()));
+
+//        http://www.qtcentre.org/threads/51348-Putting-large-size-file-on-FTP-using-QNetworkAccessManager
+//     }
 }
 
 CNetworkFTP::~CNetworkFTP()

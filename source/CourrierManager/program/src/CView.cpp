@@ -29,7 +29,6 @@ CView::CView(QWidget *parent)
     this->setCurrentDate();
     m_panel = new CDrawPanelWidget(0, 0, this);
     this->showMaximized();
-
     // Ajout des derniers
     ui->m_historyTable->setSelectionMode(QAbstractItemView::NoSelection);
     ui->m_historyTable->horizontalHeader()->setStretchLastSection(true);
