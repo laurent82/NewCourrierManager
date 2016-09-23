@@ -10,6 +10,8 @@ class CAbstractFilter;
 #include <QList>
 #include <QSettings>
 
+#include <memory>
+
 class CControler : public QObject
 {
     Q_OBJECT
@@ -34,9 +36,9 @@ private:
 	void initNetwork();
 
     QString m_ip;
-    CView* m_view;
-    CFileManager* m_fileManager;
-    CNetwork* m_network;
+    std::unique_ptr<CView> m_view;
+    std::unique_ptr<CFileManager> m_fileManager;
+    std::unique_ptr<CNetwork> m_network;
     QList<CAbstractFilter*> m_filterList;
 
 };

@@ -3,8 +3,7 @@
 
 #include <QString>
 #include <QStringList>
-#include <QtNetwork/QTcpSocket>
-
+#include <QObject>
 
 class CNetwork : public QObject
 {
@@ -15,25 +14,13 @@ public:
 	virtual void connectToServer(const QString& strIp) = 0;
 	virtual bool isConnected() = 0;
     virtual void sendList(const QStringList &list) = 0;
-    virtual void sendFile(const QString& strFilePath) = 0;
 
-protected:
-	virtual QString getNextFile() = 0;
-//private slots:
-//    void onReadyRead();
-
-//signals:
-//    void fileSent();
-//    void allFilesSent();
-//    void connectToHost();
-//    void disconnectedFromHost();
-//    void errorOccur(int);
-//
-// private:
-   
-    //QTcpSocket m_socket;
-    //QStringList m_list;
-    //int m_iter;
+signals:
+    void fileSent();
+    void allFilesSent();
+    void connectToHost();
+    void disconnectedFromHost();
+    void errorOccur(int);
 
 };
 

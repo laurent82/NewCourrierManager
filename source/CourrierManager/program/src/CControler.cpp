@@ -16,22 +16,21 @@
 
 CControler::CControler() 
     : QObject()
-    , m_network( nullptr )
-  
 {
-    m_view = new CView();
-    m_fileManager = new CFileManager();
+    m_view.reset( new CView() );
+    m_fileManager.reset( new CFileManager() );
+    m_network.reset( nullptr );
   
-    connect(m_view, SIGNAL(sendCommand(QString)), m_fileManager, SLOT(onCommandReceived(QString)));
-    connect(m_view, SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
-    connect(m_view, SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
-    connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), m_view, SLOT(onInfoReceived(QString, QVariant)));
-    connect(m_fileManager, SIGNAL(sendInfo(QString,QVariant)), this, SLOT(onInfoReceived(QString, QVariant)));
+    connect(m_view.get(), SIGNAL(sendCommand(QString)), m_fileManager.get(), SLOT(onCommandReceived(QString)));
+    connect(m_view.get(), SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
+    connect(m_view.get(), SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
+    connect(m_fileManager.get(), SIGNAL(sendInfo(QString,QVariant)), m_view.get(), SLOT(onInfoReceived(QString, QVariant)));
+    connect(m_fileManager.get(), SIGNAL(sendInfo(QString,QVariant)), this, SLOT(onInfoReceived(QString, QVariant)));
 
-    connect(this, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
+    connect(this, SIGNAL(errorOccur(int)), m_view.get(), SLOT(displayError(int)));
 	 
     // Gestion des erreurs:
-    connect(m_fileManager, SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
+    connect(m_fileManager.get(), SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
 
 //    // Gestion des plugins
 //    CPluginLoader* loader = new CPluginLoader;
@@ -43,9 +42,6 @@ CControler::CControler()
 
 CControler::~CControler()
 {
-    delete m_view;
-    delete m_fileManager;
-    delete m_network;
 }
 
 void CControler::onError(int errorId)
@@ -90,6 +86,13 @@ void CControler::onCommandReceived(QString command)
         }  else {
             emit errorOccur(CError::ALLFILESSENT);
         }
+
+        return;
+    }
+
+    if ( command.compare("update_config", Qt::CaseInsensitive) == 0)
+    {
+        return;
     }
 }
 
@@ -102,6 +105,7 @@ void CControler::showConfigDialog()
 {
     CConfigFrame config;
     config.exec();
+    onCommandReceived( "update_config" );    
 }
 
 void CControler::onFileSent()
@@ -137,22 +141,23 @@ void CControler::initNetwork()
 	QString network_method = settings.value("network_method").toString();
 	if (network_method.compare("ftp", Qt::CaseInsensitive) == 0 )
 	{
-		m_network = new CNetworkFTP();
+		m_network.reset( new CNetworkFTP() );
 
 	}
 	else if ( network_method.compare("server", Qt::CaseInsensitive) == 0 )
 	{
-		m_network = new CNetworkServer();
+		m_network.reset( new CNetworkServer() );
+        m_ip = settings.value("serverIP").toString();
+        m_network->connectToServer(m_ip);
 
 	}
 
-	m_ip = settings.value("serverIP").toString();
-	m_network->connectToServer(m_ip);
+	
 
 	// Connect
-	connect(m_network, SIGNAL(connectToHost()), m_view, SLOT(onConnectedToHost()));
-	connect(m_network, SIGNAL(disconnectedFromHost()), m_view, SLOT(onDisconnectedFromHost()));
-	connect(m_network, SIGNAL(allFilesSent()), this, SLOT(onAllFilesSent()));
-	connect(m_network, SIGNAL(fileSent()), this, SLOT(onFileSent()));
-	connect(m_network, SIGNAL(errorOccur(int)), m_view, SLOT(displayError(int)));
+	connect(m_network.get(), SIGNAL(connectToHost()), m_view.get(), SLOT(onConnectedToHost()));
+	connect(m_network.get(), SIGNAL(disconnectedFromHost()), m_view.get(), SLOT(onDisconnectedFromHost()));
+	connect(m_network.get(), SIGNAL(allFilesSent()), this, SLOT(onAllFilesSent()));
+	connect(m_network.get(), SIGNAL(fileSent()), this, SLOT(onFileSent()));
+	connect(m_network.get(), SIGNAL(errorOccur(int)), m_view.get(), SLOT(displayError(int)));
 }

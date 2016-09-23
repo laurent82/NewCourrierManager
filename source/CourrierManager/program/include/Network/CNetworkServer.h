@@ -14,10 +14,10 @@ class CNetworkServer : public CNetwork
 public:
     CNetworkServer();
     ~CNetworkServer();
-    virtual void connectToServer(const QString& strIp);
-    virtual bool isConnected();
-    virtual void sendList(const QStringList &list);
-    virtual void sendFile(const QString& strFilePath);
+    virtual void connectToServer(const QString& strIp) override;
+    virtual bool isConnected() override;
+    virtual void sendList(const QStringList &list) override;
+    void sendFile(const QString& strFilePath);
 
 private slots:
     void onReadyRead();

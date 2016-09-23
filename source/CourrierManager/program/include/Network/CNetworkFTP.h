@@ -5,10 +5,35 @@
 
 #include <QString>
 #include <QStringList>
+#include <QNetworkAccessManager>
+#include <QUrl>
+#include <QThread>
 
 #include <memory>
 
-class QNetworkAccessManager;
+class QNetworkReply;
+
+class CNetworkFTPUploader : public QObject
+{
+    Q_OBJECT
+public:
+    CNetworkFTPUploader( QUrl& url, const QString& fileName );
+    ~CNetworkFTPUploader();
+
+    void send();
+
+    bool isFinished();
+
+signals:
+    void uploadDone();
+
+private:
+     QNetworkAccessManager m_access;
+     QUrl m_url;
+     QString m_fileName;
+     QNetworkReply * m_reply;
+
+};
 
 class CNetworkFTP : public CNetwork
 {
@@ -16,17 +41,16 @@ class CNetworkFTP : public CNetwork
 public:
 	CNetworkFTP();
     ~CNetworkFTP();
-    virtual void connectToServer(const QString& strIp);
-    virtual bool isConnected();
-    virtual void sendList(const QStringList &list);
-    virtual void sendFile(const QString& strFilePath);
+    virtual void connectToServer(const QString& strIp) override;
+    virtual bool isConnected() override;
+    virtual void sendList(const QStringList &list) override;
 
-protected:
-	virtual QString getNextFile();
+private slots:
+    void onUploadDone();
 
 private:
-    std::unique_ptr<QNetworkAccessManager> m_access;
-
+    QList<CNetworkFTPUploader*> m_uploaderList;
+    int m_iter;
 };
 
 #endif // CNETWORKFP_H
