@@ -432,4 +432,18 @@ void CView::onTableRefresh()
     m_modele->setStringList(*m_fastsearch->getCurrentList());
 }
 
+void CView::updateNetworkMethod()
+{
+    QSettings settings;
+    QString current_method = settings.value("network_method").toString();
+    if ( current_method.compare("server") == 0 )
+    {
+        ui->serverBar->setVisible( true );
+    }
+    else
+    {
+        ui->serverBar->setVisible( false );
+    }
+}
+
 

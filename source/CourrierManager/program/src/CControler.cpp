@@ -26,17 +26,14 @@ CControler::CControler()
     connect(m_view.get(), SIGNAL(btnConfigurationClicked()), this, SLOT(showConfigDialog()));
     connect(m_fileManager.get(), SIGNAL(sendInfo(QString,QVariant)), m_view.get(), SLOT(onInfoReceived(QString, QVariant)));
     connect(m_fileManager.get(), SIGNAL(sendInfo(QString,QVariant)), this, SLOT(onInfoReceived(QString, QVariant)));
-
+    
     connect(this, SIGNAL(errorOccur(int)), m_view.get(), SLOT(displayError(int)));
 	 
     // Gestion des erreurs:
     connect(m_fileManager.get(), SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
-
-//    // Gestion des plugins
-//    CPluginLoader* loader = new CPluginLoader;
-//    m_filterList = loader->getList();
-//    delete loader;
-   
+    
+    initNetwork();
+    m_view->updateNetworkMethod();   
     m_view->show();
 }
 
@@ -92,6 +89,8 @@ void CControler::onCommandReceived(QString command)
 
     if ( command.compare("update_config", Qt::CaseInsensitive) == 0)
     {
+        initNetwork();
+        m_view->updateNetworkMethod();
         return;
     }
 }
@@ -151,9 +150,7 @@ void CControler::initNetwork()
         m_network->connectToServer(m_ip);
 
 	}
-
-	
-
+    
 	// Connect
 	connect(m_network.get(), SIGNAL(connectToHost()), m_view.get(), SLOT(onConnectedToHost()));
 	connect(m_network.get(), SIGNAL(disconnectedFromHost()), m_view.get(), SLOT(onDisconnectedFromHost()));

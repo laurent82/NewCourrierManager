@@ -63,7 +63,7 @@ void CNetworkFTP::connectToServer(const QString& strIp)
 
 bool CNetworkFTP::isConnected()
 {
-	return false;
+	return true;
 }
 
 void CNetworkFTP::sendList(const QStringList& list)

@@ -35,6 +35,7 @@ public:
     ~CView();
     void setProgressBar(int total);
     void updateProgressBar(int step = 1);
+    void updateNetworkMethod();
 
 protected:
     void resizeEvent(QResizeEvent *event);
