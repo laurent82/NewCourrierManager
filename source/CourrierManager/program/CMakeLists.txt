@@ -29,6 +29,7 @@ add_executable(
 )
 set ( stylesheet ${CMAKE_CURRENT_SOURCE_DIR}/res/qss/stylesheet.qss )
 target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport PluginCore)
+
+#Installer (incomplet...)
 install ( TARGETS CourrierManager DESTINATION bin )
-#install ( TARGETS ${stylesheet} DESTINATION bin )
 #file ( COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/qss/stylesheet.qss DESTINATION ${EXECUTABLE_OUTPUT_PATH} )

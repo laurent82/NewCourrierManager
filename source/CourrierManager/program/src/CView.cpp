@@ -443,6 +443,7 @@ void CView::updateNetworkMethod()
     else
     {
         ui->serverBar->setVisible( false );
+        ui->btnSend->setEnabled( true );
     }
 }
 

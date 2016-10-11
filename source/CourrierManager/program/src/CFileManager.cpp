@@ -51,7 +51,7 @@ void CFileManager::loadSettings()
     }
 
     m_searchDir = settings.value("searchDir").toString();
-    m_transferDir = settings.value("searchDir").toString();
+    m_transferDir = settings.value("transferDir").toString();
     m_destinationDir = settings.value("destinationDir").toString();
     m_backupDir = settings.value("backupDir").toString();
     m_PDFDir = settings.value("PDFDir").toString();

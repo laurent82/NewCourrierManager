@@ -6,12 +6,8 @@
 
 #include "CError.h"
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QUrl>
 #include <QFile>
 #include <QSettings>
-
 
 CNetworkFTPUploader::CNetworkFTPUploader(QUrl& url, const QString& fileName)
     : m_url ( url )
@@ -31,8 +27,27 @@ void CNetworkFTPUploader::send()
     if (data.open(QIODevice::ReadOnly))
     {
         m_reply = m_access.put(QNetworkRequest(m_url), &data);
+        m_reply->ignoreSslErrors();
         connect(m_reply, SIGNAL(finished()), this,  SIGNAL(uploadDone() ) );
+        connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError code)), this, SIGNAL(uploadError(QNetworkReply::NetworkError code)));
     } 
+
+    /*
+         // Setup download manager and start download.
+         this->download_manager = new QNetworkAccessManager();
+         QNetworkRequest request;
+         request.setUrl( this->url );
+         this->reply = this->download_manager->get( request );
+         this->reply->setReadBufferSize( BUFFER );
+
+         // Ignore SSL certificate checking as defined in the settings.
+         QSettings settings( SYSTEM_SETTINGS );
+         bool ignore_ssl_from_settings = settings.value( "DisableCertificateChecking", false ).toBool();
+         if ( ignore_ssl_from_settings || this->disable_certificate_checking )
+         {
+         this->reply->ignoreSslErrors();
+         }
+    */
 }
 
 bool CNetworkFTPUploader::isFinished()
@@ -83,8 +98,9 @@ void CNetworkFTP::sendList(const QStringList& list)
     // Create list of uploader    
     foreach ( QString fileName, list )
     {
-       CNetworkFTPUploader * ptr = new CNetworkFTPUploader ( url, fileName ) ;
+        CNetworkFTPUploader * ptr = new CNetworkFTPUploader ( url, fileName ) ;
         connect ( ptr, SIGNAL( uploadDone() ), this, SLOT ( onUploadDone() ) );
+        connect ( ptr, SIGNAL( uploadError(QNetworkReply::NetworkError code)), this, SLOT( onNetworkError(QNetworkReply::NetworkError code ) ) );
         m_uploaderList.push_back( ptr );
     }
 
@@ -114,6 +130,15 @@ void CNetworkFTP::onUploadDone()
         {
             emit allFilesSent();
         }
+    }
+}
+
+void CNetworkFTP::onNetworkError(QNetworkReply::NetworkError code)
+{
+    QIODevice * io = dynamic_cast<QIODevice*>( sender() );
+    if ( io )
+    {
+        qDebug() << "Erreur: " << io->errorString();
     }
 }
 

@@ -6,12 +6,12 @@
 #include <QString>
 #include <QStringList>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QUrl>
 #include <QThread>
 
 #include <memory>
 
-class QNetworkReply;
 
 class CNetworkFTPUploader : public QObject
 {
@@ -26,7 +26,7 @@ public:
 
 signals:
     void uploadDone();
-
+    void uploadError(QNetworkReply::NetworkError code);
 private:
      QNetworkAccessManager m_access;
      QUrl m_url;
@@ -47,6 +47,7 @@ public:
 
 private slots:
     void onUploadDone();
+    void onNetworkError( QNetworkReply::NetworkError code );
 
 private:
     QList<CNetworkFTPUploader*> m_uploaderList;

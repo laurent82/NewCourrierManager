@@ -33,8 +33,9 @@ include_directories(${PROGRAM_INCLUDE})
 include_directories(${COMMONPLUGIN_INCLUDE})
 include_directories(${GENERATED_DIR})
 
-add_subdirectory(program)
 add_subdirectory(plugins)
+add_subdirectory(program)
+
 
 message(STATUS "[/PROJECT] End of Courrier Manager")
 
