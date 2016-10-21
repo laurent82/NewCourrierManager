@@ -9,9 +9,9 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QThread>
-
 #include <memory>
 
+class QFile;
 
 class CNetworkFTPUploader : public QObject
 {
@@ -21,6 +21,10 @@ public:
     ~CNetworkFTPUploader();
 
     void send();
+
+    void deleteFile();
+
+    QNetworkReply::NetworkError getError() const;
 
     bool isFinished();
 
@@ -32,6 +36,7 @@ private:
      QUrl m_url;
      QString m_fileName;
      QNetworkReply * m_reply;
+     std::unique_ptr<QFile> m_file;
 
 };
 
@@ -52,6 +57,7 @@ private slots:
 private:
     QList<CNetworkFTPUploader*> m_uploaderList;
     int m_iter;
+    bool m_error_occured;
 };
 
 #endif // CNETWORKFP_H

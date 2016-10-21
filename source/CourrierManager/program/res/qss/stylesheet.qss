@@ -46,9 +46,16 @@ QGroupBox::title {
     padding-left: 2px;
 }
 
+QProgressDialog {
+    min-width : 500px;
+    min-heigth : 250px;
+}
+
 CDrawPanelWidget {
     border: 2px solid #92a8d2;
 }
+
+
 
 #btnConfiguration{
     background-image: url(":/configure.png");
@@ -60,3 +67,4 @@ CDrawPanelWidget {
     border: 2px solid #92a8d2;
     border-radius: 3px;
 }
+

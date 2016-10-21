@@ -21,7 +21,7 @@
 
 CView::CView(QWidget *parent)
     : QDialog(parent), ui(new Ui::CourrierManagerClass),
-      m_progress(0)
+      m_progress( nullptr )
 {
     // Ui
     ui->setupUi(this);
@@ -211,7 +211,18 @@ void CView::displayError(int errorId)
                               QMessageBox::Ok);
     break;
 
+    case CError::NETWORKFILEEXISTS:
+        QMessageBox::warning( this, tr("Courrier"),
+                              tr("Un fichier existait déjà sur le serveur et n'a pas été copié."),
+                              QMessageBox::Ok);
+    break;
     case CError::NETWORKPROBLEM:
+        if ( m_progress )
+        {
+            m_progress->hide();
+            m_progress->deleteLater();
+            m_progress = nullptr;
+        }
         QMessageBox::critical(this, tr("Courrier"),
                               tr("Une erreur s'est produite durant le transfert."),
                               QMessageBox::Ok);

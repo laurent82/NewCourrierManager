@@ -7,7 +7,13 @@
 #include "CError.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QSettings>
+
+#include <QTimer>
+#include <memory>
+
+#define TIMEOUT 10000
 
 CNetworkFTPUploader::CNetworkFTPUploader(QUrl& url, const QString& fileName)
     : m_url ( url )
@@ -23,37 +29,49 @@ CNetworkFTPUploader::~CNetworkFTPUploader()
 
 void CNetworkFTPUploader::send()
 {
-    QFile data(m_fileName);
-    if (data.open(QIODevice::ReadOnly))
+    m_file.reset( new QFile ( m_fileName ) );
+    if (m_file->open(QIODevice::ReadOnly))
     {
-        m_reply = m_access.put(QNetworkRequest(m_url), &data);
+        QNetworkRequest request(m_url);
+        m_reply = m_access.put(request, m_file.get() );
         m_reply->ignoreSslErrors();
         connect(m_reply, SIGNAL(finished()), this,  SIGNAL(uploadDone() ) );
-        connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError code)), this, SIGNAL(uploadError(QNetworkReply::NetworkError code)));
+        connect(m_reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &CNetworkFTPUploader::uploadError);
     } 
-
-    /*
-         // Setup download manager and start download.
-         this->download_manager = new QNetworkAccessManager();
-         QNetworkRequest request;
-         request.setUrl( this->url );
-         this->reply = this->download_manager->get( request );
-         this->reply->setReadBufferSize( BUFFER );
-
-         // Ignore SSL certificate checking as defined in the settings.
-         QSettings settings( SYSTEM_SETTINGS );
-         bool ignore_ssl_from_settings = settings.value( "DisableCertificateChecking", false ).toBool();
-         if ( ignore_ssl_from_settings || this->disable_certificate_checking )
-         {
-         this->reply->ignoreSslErrors();
-         }
-    */
 }
 
 bool CNetworkFTPUploader::isFinished()
 {
-    return ( m_reply->isFinished() && 
+    if ( !m_reply )
+    {
+        return true;
+    }
+
+    return ( m_reply && 
+             m_reply->isFinished() && 
              m_reply->error() == QNetworkReply::NoError ) ;
+}
+
+QNetworkReply::NetworkError CNetworkFTPUploader::getError() const
+{
+    if ( m_reply )
+    {
+        return m_reply->error();   
+    }
+    else
+    {
+        return QNetworkReply::NoError;
+    }
+}
+
+void CNetworkFTPUploader::deleteFile()
+{
+    if ( m_file->isOpen() )
+    {
+        m_file->close();
+    }
+
+    QFile::remove( m_fileName);
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -61,6 +79,7 @@ bool CNetworkFTPUploader::isFinished()
 CNetworkFTP::CNetworkFTP()
     : CNetwork()
     , m_iter(0)
+    , m_error_occured( false )
 {
 }
 
@@ -88,23 +107,27 @@ void CNetworkFTP::sendList(const QStringList& list)
     QString url_loginFTP = settings.value("loginFTP").toString();
     QString url_passwordFTP = settings.value("passwordFTP").toString();
     QString ip_server = settings.value("ipServer").toString();
-
-    QString url_adress = QString("ftp://%1/%2").arg( ip_server ).arg( url_folder );
-
-    QUrl url( url_adress);
-    url.setUserName( url_loginFTP);
-    url.setPassword( url_passwordFTP);
+    QString ftp_adress = QString("ftp://%1/%2").arg(ip_server).arg(url_folder);
 
     // Create list of uploader    
-    foreach ( QString fileName, list )
+    foreach(QString full_filename_path, list)
     {
-        CNetworkFTPUploader * ptr = new CNetworkFTPUploader ( url, fileName ) ;
-        connect ( ptr, SIGNAL( uploadDone() ), this, SLOT ( onUploadDone() ) );
-        connect ( ptr, SIGNAL( uploadError(QNetworkReply::NetworkError code)), this, SLOT( onNetworkError(QNetworkReply::NetworkError code ) ) );
-        m_uploaderList.push_back( ptr );
+        QFileInfo info(full_filename_path);
+        QString current_adress = ftp_adress;
+        current_adress.append(info.fileName());
+
+        QUrl url(current_adress);
+        url.setUserName(url_loginFTP);
+        url.setPassword(url_passwordFTP);
+        qDebug() << "Current adress: " << current_adress;
+        CNetworkFTPUploader * ptr = new CNetworkFTPUploader(url, full_filename_path);
+        connect(ptr, SIGNAL(uploadDone()), this, SLOT(onUploadDone()));
+        connect(ptr, &CNetworkFTPUploader::uploadError, this, &CNetworkFTP::onNetworkError);
+        m_uploaderList.push_back(ptr);
+
     }
 
-    if ( m_uploaderList.size() > 0 )
+    if (m_uploaderList.size() > 0)
     {
         m_uploaderList[0]->send();
     }
@@ -114,33 +137,43 @@ void CNetworkFTP::onUploadDone()
 {
     if ( !m_uploaderList[ m_iter ]->isFinished() )
     {
-        emit errorOccur( CError::NETWORKPROBLEM );
-        return;
+        // ContentAccessDenied si le fichier existe déjà
+        if (m_uploaderList[ m_iter ]->getError() == QNetworkReply::ContentAccessDenied )
+        {
+            if ( !m_error_occured )
+            {
+                emit errorOccur ( CError::NETWORKFILEEXISTS);
+                m_error_occured = true;
+            }
+        }
+        else     
+        {
+            emit errorOccur( CError::NETWORKPROBLEM );
+            return;
+        }
+    }
+
+    emit fileSent();
+    // Delete current file
+    m_uploaderList[ m_iter ]->deleteFile();
+
+    // Send next file
+    ++m_iter;
+    if (m_iter < m_uploaderList.size())
+    {
+        m_uploaderList[m_iter]->send();
     }
     else
     {
-        emit fileSent();
-        // Send next file
-        ++m_iter;
-        if ( m_iter < m_uploaderList.size() )
-        {
-            m_uploaderList[ m_iter ]->send();
-        }
-        else
-        {
-            emit allFilesSent();
-        }
+        emit allFilesSent();
     }
+
 }
 
 void CNetworkFTP::onNetworkError(QNetworkReply::NetworkError code)
 {
-    QIODevice * io = dynamic_cast<QIODevice*>( sender() );
-    if ( io )
-    {
-        qDebug() << "Erreur: " << io->errorString();
-    }
-}
+         qDebug() << "Erreur: " << code;
+   }
 
 // -------------------------------------------------------------------------------
 
