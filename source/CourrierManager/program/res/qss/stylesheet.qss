@@ -48,7 +48,7 @@ QGroupBox::title {
 
 QProgressDialog {
     min-width : 500px;
-    min-heigth : 250px;
+    min-height : 250px;
 }
 
 CDrawPanelWidget {
