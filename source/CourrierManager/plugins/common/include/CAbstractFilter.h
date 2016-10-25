@@ -1,3 +1,17 @@
+/*
+*
+*
+*
+*
+*   NOT USED!!!
+*
+*
+*
+*
+*
+*/
+
+/*
 #ifndef CABSTRACTFILTER_H
 #define CABSTRACTFILTER_H
 
@@ -36,3 +50,4 @@ protected:
 };
 
 #endif
+*/

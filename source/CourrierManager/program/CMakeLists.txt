@@ -33,6 +33,13 @@ set_property(TARGET CourrierManager PROPERTY WIN32_EXECUTABLE true)
 set ( stylesheet ${CMAKE_CURRENT_SOURCE_DIR}/res/qss/stylesheet.qss )
 target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport PluginCore)
 
+if (CM_WITH_OCR)
+    #FIXME
+    set(OCRPLUGIN_INCLUDE "${CMAKE_SOURCE_DIR}/source/CourrierManager/plugins/Ocr/tesseract/include")
+    include_directories(${OCRPLUGIN_INCLUDE})
+    target_link_libraries(CourrierManager PluginOCR)
+endif(CM_WITH_OCR)
+
 #Installer (incomplet...)
 install ( TARGETS CourrierManager DESTINATION bin )
 #file ( COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/qss/stylesheet.qss DESTINATION ${EXECUTABLE_OUTPUT_PATH} )

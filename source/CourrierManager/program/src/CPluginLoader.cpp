@@ -1,7 +1,7 @@
 #include "CPluginLoader.h"
-/*
 
-#include "CAbstractFilter.h"
+
+#include "CAbstractPlugin.h"
 #include <plugins_config.h>
 
 #if CM_WITH_HELLO
@@ -13,7 +13,7 @@
 #endif
 
 #if CM_WITH_OCR
-    #include <OcrPlugin.h>
+    #include <COcrEngine.h>
 #endif
 
 CPluginLoader::CPluginLoader()
@@ -26,7 +26,7 @@ CPluginLoader::~CPluginLoader()
 
 }
 
-QList<CAbstractFilter *> CPluginLoader::getList() const
+QList<CAbstractPlugin *> CPluginLoader::getList() const
 {
     return m_list;
 }
@@ -47,9 +47,9 @@ void CPluginLoader::init()
 #endif
 
 #if CM_WITH_OCR
-    OcrPlugin* ocrPlugin = new OcrPlugin;
-    m_list.append(ocrPlugin->createFilter());
-    delete ocrPlugin;
+    CAbstractPlugin* ocrPlugin = new COcrEngine;
+    ocrPlugin->setName("ocr");
+    m_list.append(ocrPlugin);
 #endif
 }
-*/
+

@@ -3,7 +3,7 @@
 
 #include <QList>
 
-class CAbstractFilter;
+class CAbstractPlugin;
 
 class CPluginLoader
 {
@@ -11,11 +11,11 @@ public:
     CPluginLoader();
     ~CPluginLoader();
 
-    QList<CAbstractFilter*> getList() const;
+    QList<CAbstractPlugin*> getList() const;
 
 private:
     void init();
-    QList<CAbstractFilter*> m_list;
+    QList<CAbstractPlugin*> m_list;
 
 };
 

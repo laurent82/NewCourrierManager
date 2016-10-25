@@ -11,8 +11,9 @@
 #include "Network/CNetworkFTP.h"
 #include "Network/CNetworkServer.h"
 
-// #include <CPluginLoader.h>
+ #include <CPluginLoader.h>
 // #include <CAbstractFilter.h>
+#include "Ocr/COcrManager.h"
 
 CControler::CControler() 
     : QObject()
@@ -31,7 +32,8 @@ CControler::CControler()
 	 
     // Gestion des erreurs:
     connect(m_fileManager.get(), SIGNAL(errorOccur(int)), this, SLOT(onError(int)));
-    
+
+    initPlugins();    
     initNetwork();
     m_view->updateNetworkMethod();   
     m_view->show();
@@ -157,4 +159,15 @@ void CControler::initNetwork()
 	connect(m_network.get(), SIGNAL(allFilesSent()), this, SLOT(onAllFilesSent()));
 	connect(m_network.get(), SIGNAL(fileSent()), this, SLOT(onFileSent()));
 	connect(m_network.get(), SIGNAL(errorOccur(int)), m_view.get(), SLOT(displayError(int)));
+}
+
+void CControler::initPlugins()
+{
+    std::unique_ptr<CPluginLoader> pluginLoader(new CPluginLoader());
+    m_pluginsList = pluginLoader->getList();
+    foreach ( CAbstractPlugin* filter, m_pluginsList )
+    {
+    //    QString filterName = filter->
+    }
+
 }

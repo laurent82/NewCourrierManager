@@ -1,22 +1,19 @@
 #ifndef CABSTRACTPLUGIN_H
 #define CABSTRACTPLUGIN_H
 
-#include <QtPlugin>
-#include <QObject>
+#include <QString>
 
-class CAbstractFilter;
-
-class CAbstractPlugin : public QObject
+class CAbstractPlugin 
 {
-    Q_OBJECT
 public:
-    virtual CAbstractFilter* createFilter() = 0;
-
-protected:
     CAbstractPlugin();
+    void setName( QString name);
+    QString getName() const;
+    void setActive(bool);
+    bool isActive() const;
+protected:
+    QString m_name;
+    bool m_active;
 };
-
-Q_DECLARE_INTERFACE(CAbstractPlugin, "CAbstractPlugin")
-
 
 #endif

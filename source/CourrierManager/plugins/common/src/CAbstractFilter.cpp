@@ -1,3 +1,17 @@
+/*
+*
+*
+*
+*
+*   NOT USED!!!
+*
+*
+*
+*
+*
+*/
+
+/*
 #include "CAbstractFilter.h"
 
 CAbstractFilter::CAbstractFilter(const QString name) :
@@ -47,7 +61,7 @@ QVariant CAbstractFilter::getInput(const QString& key) const
     return m_inputMap[key];
 }
 
-
+*/
 
 
 

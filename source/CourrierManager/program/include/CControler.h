@@ -4,7 +4,7 @@
 class CView;
 class CFileManager;
 class CNetwork;
-class CAbstractFilter;
+class CAbstractPlugin;
 
 #include <QObject>
 #include <QList>
@@ -34,12 +34,13 @@ signals:
 
 private:
 	void initNetwork();
+    void initPlugins();
 
     QString m_ip;
     std::unique_ptr<CView> m_view;
     std::unique_ptr<CFileManager> m_fileManager;
     std::unique_ptr<CNetwork> m_network;
-    QList<CAbstractFilter*> m_filterList;
+    QList<CAbstractPlugin*> m_pluginsList;
 
 };
     #endif
