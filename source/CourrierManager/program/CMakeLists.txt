@@ -27,6 +27,9 @@ add_executable(
     ${qt5_manager_sources}
 	${UIS_HDRS}
 )
+
+set_property(TARGET CourrierManager PROPERTY WIN32_EXECUTABLE true)
+
 set ( stylesheet ${CMAKE_CURRENT_SOURCE_DIR}/res/qss/stylesheet.qss )
 target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport PluginCore)
 
