@@ -2,6 +2,7 @@
 #define CPLUGINLOADER_H
 
 #include <QList>
+#include <memory>
 
 class CAbstractPlugin;
 
@@ -15,7 +16,7 @@ public:
 
 private:
     void init();
-    QList<CAbstractPlugin*> m_list;
+    QList<CAbstractPlugin *> m_list;
 
 };
 

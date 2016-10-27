@@ -36,6 +36,9 @@ private:
 	void initNetwork();
     void initPlugins();
 
+    void handlePlugin( QList<CAbstractPlugin*> );
+    void handlePlugin_ocr( CAbstractPlugin* );
+
     QString m_ip;
     std::unique_ptr<CView> m_view;
     std::unique_ptr<CFileManager> m_fileManager;

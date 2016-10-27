@@ -28,7 +28,7 @@ CFastSearch::~CFastSearch(){
 }
 
 void CFastSearch::readPatientList(){
-    ifstream file("/Users/jacqueline/NewCourrierManager/bin/patientlist.txt");
+    ifstream file("./patientlist.txt");
     if (file){
         string line;
         while (!file.eof()){
@@ -69,11 +69,11 @@ int CFastSearch::computeScore(int i){
     return iScore;
 }
 
-QStringList* CFastSearch::getCurrentList(){
+QStringList* CFastSearch::getCurrentList() {
     return m_currentList;
 }
 
-QStringList* CFastSearch::getFullList(){
+QStringList* CFastSearch::getFullList() {
     if (!m_fullSorted){
         m_patientList->sort();
         m_fullSorted = true;

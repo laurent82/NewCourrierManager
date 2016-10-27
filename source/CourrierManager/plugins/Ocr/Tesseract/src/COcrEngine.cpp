@@ -32,7 +32,7 @@ void convertToRaw(QImage& image, RawImage& raw)
 COcrEngine::COcrEngine()
     :CAbstractPlugin()
 {
-
+    setName( "ocr" );
 }
 
 COcrEngine::~COcrEngine()
@@ -43,6 +43,7 @@ COcrEngine::~COcrEngine()
 void COcrEngine::setInput( const QImage& image )
 {
     m_image = image;
+    start();
 }
 
 QString COcrEngine::getOutput() const
@@ -71,6 +72,8 @@ void COcrEngine::run()
     m_text = QString( api->GetUTF8Text() );
     api->End();
 }
+
+
 
 
 

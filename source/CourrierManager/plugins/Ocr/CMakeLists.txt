@@ -14,7 +14,6 @@ file(
        ${GENERATOR_PLUGINLOADER}
 )
 
-ADD_LIBRARY(PluginOCR STATIC ${ocr_sources})
 
 file(GLOB_RECURSE TESSERACT_HEADERS ${TESSERACT_INCLUDE_DIR}/*.h )
 set (TESSERACT_INCLUDE "")
@@ -28,6 +27,8 @@ link_directories( ${TESSERACT_LIB_DIR} )
 
 set(OCRPLUGIN_INCLUDE "${CMAKE_SOURCE_DIR}/source/CourrierManager/plugins/Ocr/tesseract/include")
 include_directories(${OCRPLUGIN_INCLUDE})
+
+add_library(PluginOCR STATIC ${ocr_sources})
 target_link_libraries(PluginOCR PluginCore Qt5::Core Qt5::Widgets tesseract )
 
 endif(CM_WITH_OCR)

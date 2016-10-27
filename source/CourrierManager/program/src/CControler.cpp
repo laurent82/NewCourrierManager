@@ -10,10 +10,10 @@
 
 #include "Network/CNetworkFTP.h"
 #include "Network/CNetworkServer.h"
+#include <CPluginLoader.h>
 
- #include <CPluginLoader.h>
-// #include <CAbstractFilter.h>
 #include "Ocr/COcrManager.h"
+#include <CAbstractPlugin.h>
 
 CControler::CControler() 
     : QObject()
@@ -122,18 +122,13 @@ void CControler::onAllFilesSent()
 
 void CControler::onInfoReceived(QString key, QVariant value)
 {
-//    if (key == "image") {
-//        QVariant target = value;
-//        foreach(CAbstractFilter* filter, m_filterList){
-//            if (filter->isActive()) {
-//                filter->setInput(target);
-//                filter->execute();
-//                if (filter->isOutputCreated()) {
-//                    target = filter->getOutput();
-//                }
-//            }
-//        }
-//    }
+    if (key == "image") {
+        if ( COcrManager::instance().isActive() )
+        {
+            QImage image = value.value<QImage>();
+            COcrManager::instance().setInput( image );
+        }
+    }
 }
 
 void CControler::initNetwork()
@@ -164,10 +159,25 @@ void CControler::initNetwork()
 void CControler::initPlugins()
 {
     std::unique_ptr<CPluginLoader> pluginLoader(new CPluginLoader());
-    m_pluginsList = pluginLoader->getList();
-    foreach ( CAbstractPlugin* filter, m_pluginsList )
-    {
-    //    QString filterName = filter->
-    }
-
+    handlePlugin( pluginLoader->getList() );
 }
+
+void CControler::handlePlugin( QList<CAbstractPlugin*> list)
+{
+    foreach( CAbstractPlugin* plugin, list)
+    {
+        if (plugin->getName().compare("ocr") == 0)
+        {
+            handlePlugin_ocr( plugin );
+            continue;
+
+        }
+    }
+}
+
+void CControler::handlePlugin_ocr( CAbstractPlugin* plugin)
+{
+    COcrManager::instance().setPatientList(m_view->getPatientList());
+    connect( &COcrManager::instance(), &COcrManager::sendInfo, m_view.get(), &CView::onInfoReceived );
+}
+

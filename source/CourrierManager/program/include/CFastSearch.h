@@ -16,7 +16,7 @@ public:
     void getItem(int, QString&);
     bool isInList(QString);
     QStringList* getCurrentList();
-    QStringList* getFullList();
+    QStringList* getFullList() ;
     void appendNewPatient();
 
 private:

@@ -2,7 +2,9 @@
 
 
 #include "CAbstractPlugin.h"
+#include <memory>
 #include <plugins_config.h>
+
 
 #if CM_WITH_HELLO
     #include <HelloPlugin.h>
@@ -13,6 +15,7 @@
 #endif
 
 #if CM_WITH_OCR
+    #include "Ocr/COcrManager.h"
     #include <COcrEngine.h>
 #endif
 
@@ -47,9 +50,10 @@ void CPluginLoader::init()
 #endif
 
 #if CM_WITH_OCR
-    CAbstractPlugin* ocrPlugin = new COcrEngine;
-    ocrPlugin->setName("ocr");
-    m_list.append(ocrPlugin);
+    COcrEngine* engine = new COcrEngine(); 
+    COcrManager::instance().setEngine( engine );
+
+  //  m_list.append( engine );
 #endif
 }
 

@@ -33,6 +33,9 @@ class CView : public QDialog
 public:
     CView(QWidget *parent = 0);
     ~CView();
+
+    QStringList* getPatientList() ;
+
     void setProgressBar(int total);
     void updateProgressBar(int step = 1);
     void updateNetworkMethod();

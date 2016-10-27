@@ -458,4 +458,9 @@ void CView::updateNetworkMethod()
     }
 }
 
+QStringList* CView::getPatientList() 
+{
+    return m_fastsearch->getFullList();
+}
+
 

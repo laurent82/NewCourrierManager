@@ -7,6 +7,7 @@ class CAbstractPlugin
 {
 public:
     CAbstractPlugin();
+    virtual ~CAbstractPlugin();
     void setName( QString name);
     QString getName() const;
     void setActive(bool);
