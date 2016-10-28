@@ -4,6 +4,7 @@
 class CView;
 class CFileManager;
 class CNetwork;
+class COcrManager;
 class CAbstractPlugin;
 
 #include <QObject>
@@ -43,6 +44,7 @@ private:
     std::unique_ptr<CView> m_view;
     std::unique_ptr<CFileManager> m_fileManager;
     std::unique_ptr<CNetwork> m_network;
+    std::unique_ptr<COcrManager> m_ocrManager;
     QList<CAbstractPlugin*> m_pluginsList;
 
 };

@@ -6,6 +6,7 @@
 #ifdef USE_QT5
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QCheckBox>
 #else
 #include <QWidget>
 #include <QLineEdit>
@@ -27,6 +28,7 @@ public slots:
 private:
 	QWidget* createDirSettings();
 	QWidget* createNetworkSettings();
+    QWidget* createOcrSettings();
 
     void readSettings();
 
@@ -41,6 +43,9 @@ private:
 	QLineEdit* m_loginFTP;
 	QLineEdit* m_passwordFTP;
 	QLineEdit* m_folderFTP;
+    QCheckBox* m_ocrEnabled;
+    QLineEdit* m_ocrThreshold;
+    QLineEdit* m_ocrMalus;
 
     static CConfigFrame* m_instance;
 };

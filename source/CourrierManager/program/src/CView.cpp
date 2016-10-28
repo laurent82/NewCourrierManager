@@ -73,6 +73,8 @@ CView::CView(QWidget *parent)
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnConnect, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
+    connect (ui->ocrWidget, &QListWidget::currentTextChanged, this, &CView::onOCRListChanged );
+
     ui->btnSend->setEnabled(false);
 
     // Ajoute la date de la compilation
@@ -120,14 +122,20 @@ void CView::onInfoReceived(QString key, QVariant value)
         } else {
 
         }
+
+        return;
     }
 
     if (key.compare("remainingPDF") == 0) {
         ui->lblSent->setText(QString("%1").arg(value.toInt()));
+        return;
     }
 
     if (key.compare("image") == 0) {
         m_panel->setImage(value.value<QImage>());
+        ui->ocrWidget->reset();
+        ui->ocrWidget->clear();
+        return;
     }
 
     if (key.compare("addToHistory") == 0) {
@@ -150,6 +158,16 @@ void CView::onInfoReceived(QString key, QVariant value)
             ui->m_historyTable->resizeColumnsToContents();
 
         }
+
+        return;
+    }
+
+    if ( key.compare("ocr_list") == 0 )
+    {
+        ui->ocrWidget->reset();
+        ui->ocrWidget->clear();
+        ui->ocrWidget->addItems ( value.toStringList() );
+        return;
     }
 }
 
@@ -461,6 +479,13 @@ void CView::updateNetworkMethod()
 QStringList* CView::getPatientList() 
 {
     return m_fastsearch->getFullList();
+}
+
+void CView::onOCRListChanged(QString patientName)
+{
+    QStringList list = patientName.split(", ");
+    ui->txtName->setText( list.at(0) );
+    ui->txtSurname->setText(list.at(1) );
 }
 
 

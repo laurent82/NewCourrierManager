@@ -9,25 +9,20 @@
 
 class COcrEngine;
 class COcrAnalyzer;
+class CAbstractPlugin;
 
 class COcrManager : public QObject 
 {
     Q_OBJECT
 public:
-    static COcrManager& instance();   
+    COcrManager();
 
-    void setEngine( COcrEngine* engine );
+    void setEngine( CAbstractPlugin* engine);
     void setPatientList(QStringList* list);
 
     bool isActive() const;
 
     void setInput( QImage image );
-
-    COcrManager(COcrManager const&) = delete;
-    void operator=(COcrManager const&) = delete;
-
-protected:
-     COcrManager();
 
 signals:
     void sendInfo(QString key, QVariant value);
@@ -38,6 +33,8 @@ private slots:
 private:
     std::unique_ptr<COcrAnalyzer> m_analyzer; 
     COcrEngine* m_engine;
+    bool m_active;
+    bool m_imageHasBeenSkipped;
 };
 
 #endif 

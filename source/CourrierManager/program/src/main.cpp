@@ -2,14 +2,13 @@
 #include <QFile>
 #include <QDebug>
 #include "CControler.h"
-
+#include <QTextCodec>
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
     QCoreApplication::setOrganizationName("LaurentEngelsSuite");
     QCoreApplication::setApplicationName("CourrierManager");
-
     // Loading stylesheet
     QFile file_sheet(":/stylesheet.qss");
     if ( file_sheet.open(QFile::ReadOnly) )

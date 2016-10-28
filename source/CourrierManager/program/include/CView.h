@@ -49,7 +49,7 @@ public slots:
     void onConnectedToHost();
     void onDisconnectedFromHost();
     void onActionUndone(int);
-
+    void onOCRListChanged( QString );
 protected slots:
     // Bouton d'actions
     void onButtonClicked(); // Slot activé par un bouton, destiné à envoyer un message au controller.

@@ -1,38 +1,40 @@
 #include "Ocr/COcrManager.h"
 #include "Ocr/COcrAnalyzer.h"
 #include <plugins_config.h>
-
+#include <QSettings>
 #ifdef CM_WITH_OCR
     #include <COcrEngine.h>
 #endif
 
 #include <QDebug>
 
-COcrManager& COcrManager::instance()
-{
-    static COcrManager instance;
-    return instance;
-}
-
 COcrManager::COcrManager():
-    m_engine( nullptr )
+    m_engine( nullptr ),
+    m_active( true ),
+    m_imageHasBeenSkipped( false )
 {
     m_analyzer.reset( new COcrAnalyzer() );
     connect( m_analyzer.get(), &COcrAnalyzer::sendInfo, this, &COcrManager::sendInfo );
+
+    QSettings settings;
+    m_active = settings.value("ocr_enabled").toBool();
 }
 
 bool COcrManager::isActive() const
 {
-    return m_engine != nullptr;
+    return ( m_active && m_engine != nullptr);
 }
 
-void COcrManager::setEngine( COcrEngine* engine)
+void COcrManager::setEngine( CAbstractPlugin* engine)
 {
 #ifdef CM_WITH_OCR
     if ( engine )
     {
-        m_engine = engine;
-        connect( m_engine, &COcrEngine::finished, this, &COcrManager::analyzeText );
+        m_engine = dynamic_cast<COcrEngine*>( engine );
+        if ( m_engine != nullptr )
+        {
+            connect( m_engine, &COcrEngine::finished, this, &COcrManager::analyzeText );
+        }
     }
 #endif
 }
@@ -42,7 +44,19 @@ void COcrManager::setInput(QImage image)
     if ( isActive() )
     {
 #ifdef CM_WITH_OCR
-        m_engine->setInput( image );
+        if ( !m_engine->isRunning())
+        {
+            if ( m_analyzer->isRunning() )
+            {
+                m_analyzer->stop();
+            }
+            m_imageHasBeenSkipped = false;
+            m_engine->setInput( image );
+        }
+        else
+        {
+            m_imageHasBeenSkipped = true;
+        }
 #endif
     }
 }
@@ -55,13 +69,10 @@ void COcrManager::setPatientList(QStringList* list)
 void COcrManager::analyzeText()
 {
 #ifdef CM_WITH_OCR
-    if ( m_analyzer->isRunning() )
+    if ( !m_imageHasBeenSkipped )
     {
-        m_analyzer->stop();
-        m_analyzer->wait();
+        m_analyzer->setInput( m_engine->getOutput() );
     }
-    m_analyzer->setInput( m_engine->getOutput() );
-
 #endif
 }
 

@@ -8,7 +8,7 @@
 #include <QTabWidget>
 #include <QtCore/QDir>
 #include <QSettings>
-
+#include <plugins_config.h>
 
 using namespace std;
 
@@ -22,12 +22,17 @@ CConfigFrame::CConfigFrame(QWidget *parent) :
 	QTabWidget* tabWidget = new QTabWidget;
 	tabWidget->addTab(createDirSettings(), QString("Général") );
 	tabWidget->addTab(createNetworkSettings(), "Réseau");
-   
+#ifdef CM_WITH_OCR
+    tabWidget->addTab(createOcrSettings(), "OCR");
+#endif 
+
+
 	QPushButton* closeButton = new QPushButton("Valider");
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(onValidateClicked()));
 
 	mainLayout->addWidget(tabWidget);
 	mainLayout->addWidget(closeButton);
+
 
 	readSettings();
 }
@@ -54,6 +59,12 @@ void CConfigFrame::onValidateClicked()
 	{
 		settings.setValue("network_method", "server");
 	}
+
+#ifdef CM_WITH_OCR
+    settings.setValue("ocr_enabled", m_ocrEnabled->isChecked());
+    settings.setValue("ocr_threshold", m_ocrThreshold->text().toFloat());
+    settings.setValue("ocr_malus", m_ocrMalus->text().toFloat());
+#endif 
 	
     close();
 }
@@ -80,6 +91,12 @@ void CConfigFrame::readSettings()
 		m_rbServer->setChecked(true);
 	}
 	onNetworkMethodChanged();
+
+#ifdef CM_WITH_OCR
+    m_ocrEnabled->setChecked( settings.value("ocr_enabled").toBool() );
+    m_ocrThreshold->setText(settings.value("ocr_threshold").toString() );
+    m_ocrMalus->setText(settings.value("ocr_malus").toString() );
+#endif 
 }
 
 QWidget* CConfigFrame::createDirSettings()
@@ -154,6 +171,38 @@ QWidget* CConfigFrame::createNetworkSettings()
 	return frame;
 }
 
+QWidget* CConfigFrame::createOcrSettings()
+{
+    QWidget * frame = new QFrame;
+    QVBoxLayout * mainLayout = new QVBoxLayout;
+    frame->setLayout(mainLayout);
+
+    QGridLayout* layout = new QGridLayout;
+
+    // Ligne 1 - Actif
+    m_ocrEnabled = new QCheckBox;
+    QLabel * label_ocr_enabled = new QLabel("Avec OCR:");
+    layout->addWidget(label_ocr_enabled, 0, 0);
+    layout->addWidget(m_ocrEnabled, 0, 1 );
+
+    // Ligne 2 - Threshold
+    QLabel * ocr_threshold_label = new QLabel("Threshold");
+    m_ocrThreshold = new QLineEdit;
+    layout->addWidget(ocr_threshold_label, 1, 0);
+    layout->addWidget(m_ocrThreshold, 1, 1);
+
+    // Ligne 3 - Malus
+    QLabel * malus_label = new QLabel("Malus");
+    m_ocrMalus = new QLineEdit();
+    layout->addWidget(malus_label, 2, 0 );
+    layout->addWidget(m_ocrMalus, 2, 1 );
+    
+    mainLayout->addLayout(layout);
+    mainLayout->addStretch();
+    return frame;
+}
+
+
 void  CConfigFrame::onNetworkMethodChanged()
 {
 	QSettings settings;
@@ -171,3 +220,4 @@ void  CConfigFrame::onNetworkMethodChanged()
 	}
 
 }
+

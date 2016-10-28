@@ -20,9 +20,14 @@ signals:
 private:
     QString analyze( QString word );
     float scoredAnalyze( QString word, QString target );
+    float deepWordCompare(QString word, QString target);
+
     QString m_ocrText;
     QStringList* m_patientList;
     bool m_allowedToRun;
+
+    float m_threshold;
+    float m_malus;
 
 };
 

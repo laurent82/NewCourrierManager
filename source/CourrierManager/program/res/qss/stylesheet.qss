@@ -12,6 +12,8 @@ QPushButton{
     border: 1px solid #92a8d2;
     background-color: #FFFFFF;
     font: 14px;
+    min-width: 50px;
+    min-height: 20px;
 }
 
 QPushButton::hover{
@@ -49,6 +51,10 @@ QGroupBox::title {
 QProgressDialog {
     min-width : 500px;
     min-height : 250px;
+}
+
+QTableView {
+    gridline-color: white;
 }
 
 CDrawPanelWidget {

@@ -33,11 +33,16 @@ COcrEngine::COcrEngine()
     :CAbstractPlugin()
 {
     setName( "ocr" );
+    m_api.reset(new tesseract::TessBaseAPI());
+    if (m_api->Init(NULL, "eng")) {
+        m_text = QString();
+        return;
+    }
 }
 
 COcrEngine::~COcrEngine()
 {
-
+    m_api->End();
 }
 
 void COcrEngine::setInput( const QImage& image )
@@ -59,18 +64,11 @@ void COcrEngine::run()
         return;
     }
 
-    std::unique_ptr<tesseract::TessBaseAPI> api( new tesseract::TessBaseAPI() );
-    if (api->Init(NULL, "eng")) {
-        m_text = QString();
-        return;
-    }
-
     ::RawImage raw;
     ::convertToRaw( m_image, raw);
     
-    api->SetImage(raw.data, raw.width, raw.height, raw.bpp, raw.bpl);
-    m_text = QString( api->GetUTF8Text() );
-    api->End();
+    m_api->SetImage(raw.data, raw.width, raw.height, raw.bpp, raw.bpl);
+    m_text = QString( m_api->GetUTF8Text() );
 }
 
 

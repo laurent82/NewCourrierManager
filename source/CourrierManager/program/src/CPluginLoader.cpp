@@ -51,9 +51,7 @@ void CPluginLoader::init()
 
 #if CM_WITH_OCR
     COcrEngine* engine = new COcrEngine(); 
-    COcrManager::instance().setEngine( engine );
-
-  //  m_list.append( engine );
+    m_list.append( engine );
 #endif
 }
 

@@ -21,6 +21,7 @@ CControler::CControler()
     m_view.reset( new CView() );
     m_fileManager.reset( new CFileManager() );
     m_network.reset( nullptr );
+    m_ocrManager.reset( new COcrManager );
   
     connect(m_view.get(), SIGNAL(sendCommand(QString)), m_fileManager.get(), SLOT(onCommandReceived(QString)));
     connect(m_view.get(), SIGNAL(sendCommand(QString)), this, SLOT(onCommandReceived(QString)));
@@ -123,10 +124,19 @@ void CControler::onAllFilesSent()
 void CControler::onInfoReceived(QString key, QVariant value)
 {
     if (key == "image") {
-        if ( COcrManager::instance().isActive() )
+        if ( m_ocrManager->isActive() )
         {
             QImage image = value.value<QImage>();
-            COcrManager::instance().setInput( image );
+            m_ocrManager->setInput( image );
+        }
+    }
+
+    if ( key == "ocr_list" )
+    {
+        qDebug() << "Analyse OCR ";
+        foreach ( QString result, value.value<QStringList>() )
+        {
+            qDebug() << result;
         }
     }
 }
@@ -177,7 +187,8 @@ void CControler::handlePlugin( QList<CAbstractPlugin*> list)
 
 void CControler::handlePlugin_ocr( CAbstractPlugin* plugin)
 {
-    COcrManager::instance().setPatientList(m_view->getPatientList());
-    connect( &COcrManager::instance(), &COcrManager::sendInfo, m_view.get(), &CView::onInfoReceived );
+    m_ocrManager->setEngine( plugin );
+    m_ocrManager->setPatientList(m_view->getPatientList());
+    connect( m_ocrManager.get(), &COcrManager::sendInfo, m_view.get(), &CView::onInfoReceived );
 }
 

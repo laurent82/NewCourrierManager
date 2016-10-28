@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>975</width>
+    <width>1329</width>
     <height>851</height>
    </rect>
   </property>
@@ -52,7 +52,7 @@
       <x>10</x>
       <y>10</y>
       <width>261</width>
-      <height>271</height>
+      <height>311</height>
      </rect>
     </property>
     <property name="title">
@@ -205,7 +205,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
+       <y>150</y>
        <width>46</width>
        <height>21</height>
       </rect>
@@ -224,7 +224,7 @@
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>140</y>
+       <y>150</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -237,7 +237,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>220</y>
+       <y>250</y>
        <width>241</width>
        <height>41</height>
       </rect>
@@ -250,7 +250,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>220</y>
        <width>241</width>
        <height>31</height>
       </rect>
@@ -259,14 +259,29 @@
       <string>Patient identique</string>
      </property>
     </widget>
+    <zorder>lblNom</zorder>
+    <zorder>lblPrenom</zorder>
+    <zorder>txtName</zorder>
+    <zorder>txtSurname</zorder>
+    <zorder>lblDate</zorder>
+    <zorder>btnToday</zorder>
+    <zorder>txtDay</zorder>
+    <zorder>txtMonth</zorder>
+    <zorder>txtYear</zorder>
+    <zorder>btnLastDate</zorder>
+    <zorder>lblPage</zorder>
+    <zorder>spPage</zorder>
+    <zorder>btnValidate</zorder>
+    <zorder>btnSamePatient</zorder>
+    <zorder>grpFastSearch</zorder>
    </widget>
    <widget class="QGroupBox" name="grpFastSearch">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>330</y>
       <width>261</width>
-      <height>241</height>
+      <height>281</height>
      </rect>
     </property>
     <property name="title">
@@ -294,7 +309,7 @@
        <x>10</x>
        <y>40</y>
        <width>241</width>
-       <height>192</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="horizontalScrollBarPolicy">
@@ -309,7 +324,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>550</y>
+      <y>630</y>
       <width>121</width>
       <height>41</height>
      </rect>
@@ -322,7 +337,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>550</y>
+      <y>630</y>
       <width>121</width>
       <height>41</height>
      </rect>
@@ -337,48 +352,12 @@
      <string>&lt;&lt; Supprimer &gt;&gt;</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="grpLastMade">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>10</y>
-      <width>251</width>
-      <height>671</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Derniers courriers classés</string>
-    </property>
-    <widget class="QTableWidget" name="m_historyTable">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>231</width>
-       <height>621</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QPushButton" name="btnConvert">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>590</y>
-      <width>121</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Convertir</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="lblVersion">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>650</y>
-      <width>241</width>
+      <x>430</x>
+      <y>670</y>
+      <width>101</width>
       <height>16</height>
      </rect>
     </property>
@@ -389,10 +368,10 @@
    <widget class="QPushButton" name="btnConfiguration">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>480</x>
       <y>630</y>
       <width>50</width>
-      <height>50</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -454,6 +433,52 @@
      </property>
      <property name="text">
       <string>Reconnecter</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="grpOcr">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>330</y>
+      <width>251</width>
+      <height>281</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Proposition</string>
+    </property>
+    <widget class="QListWidget" name="ocrWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>231</width>
+       <height>231</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="grpLastMade">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>10</y>
+      <width>251</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Derniers courriers classés</string>
+    </property>
+    <widget class="QTableWidget" name="m_historyTable">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>231</width>
+       <height>251</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -571,6 +596,23 @@
     </widget>
    </widget>
   </widget>
+  <widget class="QPushButton" name="btnConvert">
+   <property name="geometry">
+    <rect>
+     <x>990</x>
+     <y>790</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Convertir</string>
+   </property>
+  </widget>
+  <zorder>toolBar</zorder>
+  <zorder>topButtons</zorder>
+  <zorder>horizontalLayoutWidget</zorder>
+  <zorder>btnConvert</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

@@ -1,6 +1,6 @@
 message (STATUS "[EXECUTABLE] Generation of Manager")
 
-set ( CM_WITH_CONSOLE OFF CACHE BOOL "Add console")
+set ( CM_WITH_CONSOLE FALSE CACHE BOOL "Add console")
 
 # Definition of CourrierManager
 QT5_WRAP_UI(UIS_HDRS
@@ -39,9 +39,8 @@ add_executable(
 )
 
 if ( NOT CM_WITH_CONSOLE )
-    message("Suppression de la console")
 	set_property(TARGET CourrierManager PROPERTY WIN32_EXECUTABLE true)
-endif ( NOT CM_WITH_CONSOLE )
+endif ( CM_WITH_CONSOLE )
 
 target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport PluginCore)
 
