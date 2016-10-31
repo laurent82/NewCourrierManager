@@ -40,7 +40,7 @@ add_executable(
 
 if ( NOT CM_WITH_CONSOLE )
 	set_property(TARGET CourrierManager PROPERTY WIN32_EXECUTABLE true)
-endif ( CM_WITH_CONSOLE )
+endif ( NOT CM_WITH_CONSOLE )
 
 target_link_libraries(CourrierManager Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport PluginCore)
 
