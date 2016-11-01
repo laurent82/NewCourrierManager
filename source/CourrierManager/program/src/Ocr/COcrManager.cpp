@@ -2,7 +2,7 @@
 #include "Ocr/COcrAnalyzer.h"
 #include <plugins_config.h>
 #include <QSettings>
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     #include <COcrEngine.h>
 #endif
 
@@ -27,7 +27,7 @@ bool COcrManager::isActive() const
 
 void COcrManager::setEngine( CAbstractPlugin* engine)
 {
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     if ( engine )
     {
         m_engine = dynamic_cast<COcrEngine*>( engine );
@@ -43,7 +43,7 @@ void COcrManager::setInput(QImage image)
 {
     if ( isActive() )
     {
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
         if ( !m_engine->isRunning())
         {
             if ( m_analyzer->isRunning() )
@@ -68,7 +68,7 @@ void COcrManager::setPatientList(QStringList* list)
 
 void COcrManager::analyzeText()
 {
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     if ( !m_imageHasBeenSkipped )
     {
         m_analyzer->setInput( m_engine->getOutput() );

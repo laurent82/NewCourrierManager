@@ -22,9 +22,9 @@ CConfigFrame::CConfigFrame(QWidget *parent) :
 	QTabWidget* tabWidget = new QTabWidget;
 	tabWidget->addTab(createDirSettings(), QString("Général") );
 	tabWidget->addTab(createNetworkSettings(), "Réseau");
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     tabWidget->addTab(createOcrSettings(), "OCR");
-#endif 
+#endif
 
 
 	QPushButton* closeButton = new QPushButton("Valider");
@@ -60,7 +60,7 @@ void CConfigFrame::onValidateClicked()
 		settings.setValue("network_method", "server");
 	}
 
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     settings.setValue("ocr_enabled", m_ocrEnabled->isChecked());
     settings.setValue("ocr_threshold", m_ocrThreshold->text().toFloat());
     settings.setValue("ocr_malus", m_ocrMalus->text().toFloat());
@@ -92,7 +92,7 @@ void CConfigFrame::readSettings()
 	}
 	onNetworkMethodChanged();
 
-#ifdef CM_WITH_OCR
+#if CM_WITH_OCR
     m_ocrEnabled->setChecked( settings.value("ocr_enabled").toBool() );
     m_ocrThreshold->setText(settings.value("ocr_threshold").toString() );
     m_ocrMalus->setText(settings.value("ocr_malus").toString() );
