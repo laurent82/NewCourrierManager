@@ -96,8 +96,8 @@ void CFileManager::onCommandReceived(QString command)
         // Envoi de la prochaine image.
         int iRemaining = (m_fileList->size() - m_i >= 0)? m_fileList->size() - m_i: 0;
         if (iRemaining > 0) {
-            QString fileToLoad = getFile();
-            QImage image = QImage(fileToLoad);
+            m_currentFileName = getFile();
+            QImage image = QImage(m_currentFileName);
             emit sendInfo("image", QVariant::fromValue<QImage>(image));
         }
     }
@@ -131,6 +131,17 @@ void CFileManager::onCommandReceived(QString command)
         deleteFile();
         refreshRemaining();
     }
+
+    // Rotate
+    if ( command.compare("rotate") == 0 ) {
+        rotateImage();
+    }
+
+    // Landscape
+    if ( command.compare("landscape") == 0 ) {
+        flipLandscape();
+    }
+
 }
 
 void CFileManager::run()
@@ -492,14 +503,40 @@ bool CFileManager::copyNextFile(){
 
 void CFileManager::prepareNext()
 {
-    QString fileToLoad = getNextFile();
-    if ( !fileToLoad.isEmpty() ) {
-        QImage image = QImage(fileToLoad);
+    m_currentFileName = getNextFile();
+    if ( !m_currentFileName.isEmpty() ) {
+        QImage image = QImage(m_currentFileName);
         emit sendInfo("image", QVariant::fromValue<QImage>(image));
     } /*else {
         emit errorOccur(CError::NOMOREFILE);
     }*/
 }
+
+void CFileManager::rotateImage()
+{
+    if ( !m_currentFileName.isEmpty() ){
+        QPixmap pixmap = QPixmap(m_currentFileName);
+        QMatrix rm;
+        rm.rotate(180);
+        pixmap = pixmap.transformed(rm);
+        pixmap.save( m_currentFileName );
+        emit sendInfo("image", QVariant::fromValue<QImage>( pixmap.toImage() ) );
+    }
+}
+
+void  CFileManager::flipLandscape()
+{
+    if ( !m_currentFileName.isEmpty() ){
+        QPixmap pixmap = QPixmap(m_currentFileName);
+        QMatrix rm;
+        rm.rotate(90);
+        pixmap = pixmap.transformed(rm);
+        pixmap.save( m_currentFileName );
+        emit sendInfo("image", QVariant::fromValue<QImage>( pixmap.toImage() ) );
+    }
+}
+
+
 
 QStringList CFileManager::searchJPGForPatient(const QString& radicalName)
 {

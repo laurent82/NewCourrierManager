@@ -259,21 +259,6 @@
       <string>Patient identique</string>
      </property>
     </widget>
-    <zorder>lblNom</zorder>
-    <zorder>lblPrenom</zorder>
-    <zorder>txtName</zorder>
-    <zorder>txtSurname</zorder>
-    <zorder>lblDate</zorder>
-    <zorder>btnToday</zorder>
-    <zorder>txtDay</zorder>
-    <zorder>txtMonth</zorder>
-    <zorder>txtYear</zorder>
-    <zorder>btnLastDate</zorder>
-    <zorder>lblPage</zorder>
-    <zorder>spPage</zorder>
-    <zorder>btnValidate</zorder>
-    <zorder>btnSamePatient</zorder>
-    <zorder>grpFastSearch</zorder>
    </widget>
    <widget class="QGroupBox" name="grpFastSearch">
     <property name="geometry">
@@ -323,22 +308,22 @@
    <widget class="QPushButton" name="btnNext">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>160</x>
       <y>630</y>
-      <width>121</width>
+      <width>50</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt; Passer &gt;</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="btnDelete">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>220</x>
       <y>630</y>
-      <width>121</width>
+      <width>50</width>
       <height>41</height>
      </rect>
     </property>
@@ -349,7 +334,7 @@
      </font>
     </property>
     <property name="text">
-     <string>&lt;&lt; Supprimer &gt;&gt;</string>
+     <string/>
     </property>
    </widget>
    <widget class="QLabel" name="lblVersion">
@@ -482,6 +467,32 @@
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="btnRotate">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>630</y>
+      <width>50</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnLandscape">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>630</y>
+      <width>50</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="topButtons">
    <property name="geometry">
@@ -609,10 +620,6 @@
     <string>Convertir</string>
    </property>
   </widget>
-  <zorder>toolBar</zorder>
-  <zorder>topButtons</zorder>
-  <zorder>horizontalLayoutWidget</zorder>
-  <zorder>btnConvert</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

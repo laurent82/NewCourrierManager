@@ -1,6 +1,10 @@
 <RCC>
-    <qresource>
+    <qresource prefix="/">
         <file alias="stylesheet.qss">qss/stylesheet.qss</file>
         <file alias="configure.png">icons/configure.png</file>
+        <file alias="delete.png">icons/delete.png</file>
+        <file alias="rotate.png">icons/rotate.png</file>
+        <file alias="skip.png">icons/skip.png</file>
+        <file alias="landscape.png">icons/landscape.png</file>
     </qresource>
 </RCC>

@@ -92,6 +92,10 @@ private:
 
     void prepareNext();
 
+    void rotateImage();
+
+    void flipLandscape();
+
     bool convertPDF(const QString &pdfName, const QString &radicalName);
 
     /**
@@ -113,12 +117,14 @@ private:
     QString m_searchDir;        /// Répertoire où se trouve le courrier à classer (en JPG)
     QString m_transferDir;      /// Répertoire où le courrier est stocké avant d'etre transféré
     QString m_destinationDir;   /// Répertoire où le courrier est envoyé (obsolète)
-    QString m_backupDir;        /// Répertoire où le courrier est conservé en local
+    QString m_backupDir;        /// Répertoire où le courrier est conservé en local sous format JPG
     QString m_PDFDir;           /// Répertoire où le courrier est conservé en local sous format PDF
 
     int m_i;    // Indice de parcours dans le fichier
     int m_ic;   // Indice de parcours des fichiers à copier (obsolète)
     int m_sendremaining;
+
+    QString m_currentFileName;
     CFastSearch* m_fastsearch;
 
 };
