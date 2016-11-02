@@ -42,7 +42,6 @@ void CFileManager::loadSettings()
     if ( settings.status() != QSettings::NoError ||
          !settings.contains("searchDir")   ||
          !settings.contains("transferDir") ||
-         !settings.contains("destinationDir") ||
          !settings.contains("backupDir") ||
          !settings.contains("PDFDir") )
     {
@@ -52,13 +51,11 @@ void CFileManager::loadSettings()
 
     m_searchDir = settings.value("searchDir").toString();
     m_transferDir = settings.value("transferDir").toString();
-    m_destinationDir = settings.value("destinationDir").toString();
     m_backupDir = settings.value("backupDir").toString();
     m_PDFDir = settings.value("PDFDir").toString();
 
     m_searchDir.append('/');
     m_transferDir.append('/');
-    m_destinationDir.append('/');
     m_backupDir.append('/');
     m_PDFDir.append('/');
 }
@@ -402,103 +399,6 @@ void CFileManager::setFastSearch(CFastSearch* _fs){
 
 void CFileManager::setLastAdded(QStringList* _la){
     m_lastAdded = _la;
-}
-
-
-//    // Ouverture du fichier
-//    if (m_fileList->size()){
-//        QString strFileToOpen;
-//        getFile(strFileToOpen);
-//        if (strFileToOpen.isNull())
-//            return false;
-
-//        QFile file(strFileToOpen);
-//        // Cr�ation du nouveau nom
-//        QString strFileName;
-//        QString backupFileName;
-//        constructFileName(strFileName);
-//        if (strFileName.isNull() || strFileName.isEmpty())
-//            return false;
-
-//        backupFileName = strFileName;
-//        strFileName.prepend(m_transferDir);
-//        backupFileName.prepend(m_backupDir);
-//        // V�rification si le nom de fichier n'existe pas d�j� (erreur d'encodage, reprise...). Modifie le nom sinon
-//        while (QFile::exists(strFileName) || QFile::exists(backupFileName)){
-//            m_lastPatient->page++;
-//            strFileName.clear();
-//            constructFileName(strFileName);
-//            backupFileName = strFileName;
-//            strFileName.prepend(m_transferDir);     // Ex: toTransfer/NomFichier.jpg
-//            backupFileName.prepend(m_backupDir);    // Ex: backup/NomFichier.jpg
-//        }
-//        // Rem : file.copy(strFileName) : copie du fichier toTransfer, pour le moment mis en commentaire car la synchro se fait avec SyncToy
-//        if (!(/*file.copy(strFileName) &&*/ file.copy(backupFileName) && file.remove())){
-//            return false;
-//        }
-//        convertPDF(backupFileName);
-//        m_sendremaining++;
-//        // Ecriture du nom du patient dans une liste de patient
-//        QString fullName = m_lastPatient->name;
-//        fullName.append(", ");
-//        fullName.append(m_lastPatient->surname);
-//        if (!_tableUsed){ // V�rification si on ne s'est pas servi de la table
-//            //assert(m_fastsearch);
-//            if (!m_fastsearch->isInList(fullName)){ // V�rifie si le patient n'est pas d�j� dans la liste, l'ajoute sinon
-//                ofstream filePatientList("patientlist.txt", ios_base::out | ios_base::app);
-//                if (filePatientList){
-//                    filePatientList << m_lastPatient->name.toLatin1().data() << ";" << m_lastPatient->surname.toLatin1().data() << ";" << endl;
-//                    filePatientList.close();
-//                }
-//            }
-//        }
-//        // Ajout dans la liste des derniers ajout�s
-//        //assert(m_lastAdded);
-//        fullName.append(QString(" (%1 - %2)").arg(m_lastPatient->page).arg(m_lastPatient->date));
-//        m_lastAdded->prepend(fullName);
-//        // Ecriture du nom du fichier dans une table, fichier,...
-//        /*ofstream fileTransfert("transfertlist.txt", ios_base::out | ios_base::app);
-//        if (fileTransfert){
-//            fileTransfert << m_lastPatient->date.toLatin1().data() << ";" << m_lastPatient->name.toLatin1().data() << ";" << m_lastPatient->surname.toLatin1().data() <<";" << m_lastPatient->page << endl;
-//            fileTransfert.close();
-//        }*/
-//        return true;
-//    }
-//    else
-//        return false;
-//}
-
-void CFileManager::initCopyFile(){
-    m_fileToCopyList = new QStringList;
-    QDir dir(m_transferDir);
-    QStringList filters;
-    filters << "*.pdf" << "*.PDF";
-    dir.setNameFilters(filters);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    QFileInfoList list = dir.entryInfoList();
-    for (int i = 0; i < list.size(); ++i) {
-        QFileInfo fileInfo = list.at(i);
-        m_fileToCopyList->append(fileInfo.fileName());
-    }
-    m_sendremaining = m_fileToCopyList->size();
-    m_ic = 0;
-}
-
-bool CFileManager::copyNextFile(){
-    if (!m_fileToCopyList)
-        initCopyFile();
-    if (m_ic >= 0 && m_ic < m_fileToCopyList->size()){
-        QString strFileToOpen = m_transferDir + m_fileToCopyList->at(m_ic);
-        QFile file(strFileToOpen);
-        QString strDestinationFile = m_destinationDir + m_fileToCopyList->at(m_ic);
-        if (!(file.copy(strDestinationFile) && file.remove())){
-            return false;
-        }
-        m_ic++;
-        return true;
-    }
-    else
-        return false;
 }
 
 void CFileManager::prepareNext()

@@ -50,13 +50,10 @@ public:
     // - préparation de la liste des fichiers à copier
     ///////////////////////////////////////
 
-    bool renameFile(/*QFile* file, bool tableUsed = false*/);
+    bool renameFile();
 
     QStringList getFilesToSend();
 
-    void initCopyFile(); // Obsolète
-
-    bool copyNextFile(); // Obsolète
 
     ///////////////////////////////////////
     // Gestion de masse
@@ -116,7 +113,6 @@ private:
     QStringList* m_lastAdded;   /// Liste des derniers courriers traités
     QString m_searchDir;        /// Répertoire où se trouve le courrier à classer (en JPG)
     QString m_transferDir;      /// Répertoire où le courrier est stocké avant d'etre transféré
-    QString m_destinationDir;   /// Répertoire où le courrier est envoyé (obsolète)
     QString m_backupDir;        /// Répertoire où le courrier est conservé en local sous format JPG
     QString m_PDFDir;           /// Répertoire où le courrier est conservé en local sous format PDF
 

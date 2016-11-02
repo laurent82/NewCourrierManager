@@ -42,7 +42,6 @@ void CConfigFrame::onValidateClicked()
     QSettings settings;
     settings.setValue( "searchDir", m_searchLine->text());
     settings.setValue( "transferDir", m_transferLine->text());
-    settings.setValue( "destinationDir", m_destinationLine->text());
     settings.setValue( "backupDir", m_backupLine->text());
     settings.setValue( "PDFDir", m_PDFLine->text());
     
@@ -75,7 +74,6 @@ void CConfigFrame::readSettings()
 
     m_searchLine->setText( settings.value( "searchDir" ).toString() );
     m_transferLine->setText( settings.value( "transferDir" ).toString() );
-    m_destinationLine->setText( settings.value( "destinationDir" ).toString() );
     m_backupLine->setText( settings.value( "backupDir" ).toString() );
     m_PDFLine->setText( settings.value( "PDFDir" ).toString() );
     m_IPLine->setText( settings.value( "ipServer" ).toString() );
@@ -107,7 +105,6 @@ QWidget* CConfigFrame::createDirSettings()
 
 	m_searchLine = new QLineEdit;
 	m_transferLine = new QLineEdit;
-	m_destinationLine = new QLineEdit;
 	m_backupLine = new QLineEdit;
 	m_PDFLine = new QLineEdit;
 
@@ -115,7 +112,6 @@ QWidget* CConfigFrame::createDirSettings()
 	layout->addRow(QString("Current path:"), currentPath);
 	layout->addRow(QString("Search"), m_searchLine);
 	layout->addRow(QString("Transfer"), m_transferLine);
-	layout->addRow(QString("Destination"), m_destinationLine);
 	layout->addRow(QString("Backup"), m_backupLine);
 	layout->addRow(QString("PDF"), m_PDFLine);
 

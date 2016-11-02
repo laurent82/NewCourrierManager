@@ -34,7 +34,6 @@ private:
 
     QLineEdit* m_searchLine;
     QLineEdit* m_transferLine;
-    QLineEdit* m_destinationLine;
     QLineEdit* m_backupLine;
     QLineEdit* m_PDFLine;
     QLineEdit* m_IPLine;
