@@ -69,6 +69,35 @@ CDrawPanelWidget {
     background-repeat: no-repeat;
 }
 
+#btnRotate{
+    background-image: url(":/rotate.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#btnNext{
+    background-image: url(":/skip.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#btnLandscape{
+    background-image: url(":/landscape.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#btnDelete{
+    background-image: url(":/delete.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#btnDelete::hover{
+    border: 1px solid red;
+}
+
+
 #toolBar {
     border: 2px solid #92a8d2;
     border-radius: 3px;

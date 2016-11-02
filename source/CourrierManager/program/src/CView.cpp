@@ -55,6 +55,8 @@ CView::CView(QWidget *parent)
     ui->btnNext->setProperty("commandName", "skip");
     ui->btnDelete->setProperty("commandName", "delete");
     ui->btnConnect->setProperty("commandName", "connect");
+    ui->btnRotate->setProperty("commandName", "rotate");
+    ui->btnLandscape->setProperty("commandName", "landscape");
 
     ui->btnLastDate->setProperty("type", "small" );
     ui->btnToday->setProperty("type", "small");
@@ -74,6 +76,8 @@ CView::CView(QWidget *parent)
     connect (ui->btnNext, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnDelete, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnConnect, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnRotate, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
+    connect (ui->btnLandscape, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
     connect (ui->ocrWidget, &QListWidget::currentTextChanged, this, &CView::onOCRListChanged );
 

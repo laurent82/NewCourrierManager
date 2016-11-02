@@ -13,6 +13,7 @@
 #include <CPluginLoader.h>
 
 #include "Ocr/COcrManager.h"
+#include "Ocr/COcrAnalyzer.h"
 #include <CAbstractPlugin.h>
 
 CControler::CControler() 
