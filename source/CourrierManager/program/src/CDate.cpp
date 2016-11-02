@@ -31,3 +31,26 @@ void  CDate::extractDate(const QString& date, QString& day, QString& month, QStr
     day = var;
 }
 
+void CDate::extractDateFromOcr(const QString& date, QString& day, QString& month, QString& year)
+{
+    QChar seperator;
+    if ( date.contains("/") )
+    {
+        seperator = '/';
+    }
+    else
+    {
+        seperator = '-';
+    }
+    QStringList date_list = date.split( seperator );
+    day = date_list.at(0);
+    month = date_list.at(1);
+    year = date_list.at(2);
+}
+
+bool CDate::isDate(const QString& date)
+{
+    QRegExp reDate("[0-9]{1,2}[/-][0-9]{2,2}[/-][0-9]{2,4}");
+    return reDate.exactMatch( date ); 
+}
+

@@ -65,6 +65,8 @@ CView::CView(QWidget *parent)
     style()->unpolish(ui->btnLastDate);
     style()->polish(ui->btnLastDate);
 
+    ui->btnSend->setEnabled( false );
+
     connect (ui->btnConfiguration, SIGNAL(clicked()), this, SIGNAL(btnConfigurationClicked()));
     connect (ui->btnSearch, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect (ui->btnSend, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
@@ -74,8 +76,6 @@ CView::CView(QWidget *parent)
     connect (ui->btnConnect, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
 
     connect (ui->ocrWidget, &QListWidget::currentTextChanged, this, &CView::onOCRListChanged );
-
-    ui->btnSend->setEnabled(false);
 
     // Ajoute la date de la compilation
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
@@ -122,13 +122,14 @@ void CView::onInfoReceived(QString key, QVariant value)
         } else {
 
         }
-
+        
         return;
     }
 
     if (key.compare("remainingPDF") == 0) {
         ui->lblSent->setText(QString("%1").arg(value.toInt()));
-        return;
+        ui->btnSend->setEnabled( (  ui->lblSent->text().toInt() != 0 ) );
+       return;
     }
 
     if (key.compare("image") == 0) {
@@ -167,6 +168,15 @@ void CView::onInfoReceived(QString key, QVariant value)
         ui->ocrWidget->reset();
         ui->ocrWidget->clear();
         ui->ocrWidget->addItems ( value.toStringList() );
+        return;
+    }
+
+    if ( key.compare("ocr_date") == 0 )
+    {
+        QString day, month, year;
+        QString full_date = value.toString();
+        CDate::extractDateFromOcr( full_date, day, month, year );
+        setCustomDate( day, month, year);
         return;
     }
 }
@@ -265,6 +275,15 @@ void CView::setCurrentDate(){
     ui->txtYear->setText(QString("%1").arg(date.year()));
 }
 
+
+void CView::setCustomDate(const QString& day, const QString& month, const QString& year)
+{
+    ui->txtDay->setText( day );
+    ui->txtMonth->setText( month );
+    ui->txtYear->setText( year );
+}
+
+
 void CView::resetInfoPatient()
 {
     ui->txtName->clear();
@@ -348,16 +367,10 @@ void CView::onButtonClicked()
 
     // Cas du bouton Valider
     if (name.compare("validate") == 0) {
-        if (checkFields()) {
-            fillPatient();
-            clearFields();
-            if (!m_tableUsed) {
-                m_fastsearch->appendNewPatient();
-            }
-        } else {
-            displayError(CError::EMPTYFIELD);
+       if (!validate())
+       {
             return;
-        }
+       }
     }
     emit sendCommand(name);
 }
@@ -472,7 +485,7 @@ void CView::updateNetworkMethod()
     else
     {
         ui->serverBar->setVisible( false );
-        ui->btnSend->setEnabled( true );
+        ui->btnSend->setEnabled( false );
     }
 }
 
@@ -486,6 +499,38 @@ void CView::onOCRListChanged(QString patientName)
     QStringList list = patientName.split(", ");
     ui->txtName->setText( list.at(0) );
     ui->txtSurname->setText(list.at(1) );
+}
+
+void CView::keyPressEvent(QKeyEvent event)
+{
+    switch ( event->key() )
+    {
+    case Qt::Key_Enter:
+        validate();
+        break;
+    case Qt::Key_Tab:
+        //act on 'Y'
+        break;
+    default:
+        event->ignore();
+        break;
+    }
+}
+
+bool CView::validate()
+{
+    if (checkFields()) {
+        fillPatient();
+        clearFields();
+        if (!m_tableUsed) {
+            m_fastsearch->appendNewPatient();
+        }
+        return true;
+    }
+    else {
+        displayError(CError::EMPTYFIELD);
+        return false;
+    }
 }
 
 

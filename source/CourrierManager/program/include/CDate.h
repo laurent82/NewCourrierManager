@@ -17,6 +17,8 @@ public:
      * @param year (Sortie) Année
      */
     static void extractDate(const QString& date, QString& day, QString& month, QString& year);
+    static void extractDateFromOcr(const QString& date, QString& day, QString& month, QString& year);
+    static bool isDate( const QString& date );
 };
 
 #endif // CDATE_H

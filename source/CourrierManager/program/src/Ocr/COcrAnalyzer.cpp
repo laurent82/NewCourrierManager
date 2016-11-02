@@ -1,4 +1,5 @@
 #include "Ocr/COcrAnalyzer.h"
+#include "CDate.h"
 
 #include <QDebug>
 #include <QSettings>
@@ -40,6 +41,8 @@ void COcrAnalyzer::run()
 
     QStringList response;
     m_allowedToRun = true;
+
+
     foreach( QString word, splitted )
     {
         if ( !m_allowedToRun )
@@ -48,15 +51,22 @@ void COcrAnalyzer::run()
         }
 
         word.remove(QRegExp("[.?!;,:]"));
-        QString current_analyze = analyze( word );
-        if ( !current_analyze.isEmpty() && !response.contains( current_analyze) )
+
+        if ( CDate::isDate( word ) )
         {
-            response.append( current_analyze );
+            emit sendInfo ( "ocr_date", word );    
+        }
+        else
+        {
+            QString current_analyze = analyze(word);
+            if (!current_analyze.isEmpty() && !response.contains(current_analyze))
+            {
+                response.append(current_analyze);
+            }
         }
         
     }
 
-    qDebug() << "Send list";
     emit sendInfo ( "ocr_list", response );
 }
 
@@ -116,6 +126,12 @@ float COcrAnalyzer::deepWordCompare(QString word, QString target)
          || ( word.size() >  target.size() + 1) )
     {
         return 0.0;
+    }
+
+    // Ne compare que si les deux mots ont la meme premiere lettre.
+    if ( word[0].toLower() != target[0].toLower() )
+    {
+        return 0.0; 
     }
 
     float current_score = 0;

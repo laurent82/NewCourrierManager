@@ -42,6 +42,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void keyPressEvent( QKeyEvent event);
 
 public slots:
     void onInfoReceived(QString key, QVariant value);
@@ -100,6 +101,12 @@ private:
     void setCurrentDate();
 
     /**
+      * @brief Complète les champs "date" avec une date spécifique
+      */
+    void setCustomDate( const QString& day, const QString& month, const QString& year);
+
+
+    /**
       * @brief Construit un string représentant la date du jour.
       * @return  La date est format YYYYMMDD
       */
@@ -111,6 +118,8 @@ private:
     bool checkFields();
 
     void removeFromHistory (int id);
+
+    bool validate();
 
     QString m_lastDate; /// Dernière date enregistrée.
 
