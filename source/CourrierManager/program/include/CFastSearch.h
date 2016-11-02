@@ -14,6 +14,7 @@ public:
     void run();
     void setWord(QString);
     void getItem(int, QString&);
+    void getCurrentItem(int, QString&);
     bool isInList(QString);
     QStringList* getCurrentList();
     QStringList* getFullList() ;

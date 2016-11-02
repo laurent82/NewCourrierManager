@@ -6,7 +6,6 @@
 #include <QtCore/QDate>
 #include <QHeaderView>
 
-
 #include "CView.h"
 #include "ui_courriermanager.h"
 
@@ -18,6 +17,7 @@
 #include "Action/CAction.h"
 
 #include <QDebug>
+
 
 CView::CView(QWidget *parent)
     : QDialog(parent), ui(new Ui::CourrierManagerClass),
@@ -85,6 +85,9 @@ CView::CView(QWidget *parent)
     ui->lblVersion->setText(QString("Version: ") + QString::fromLocal8Bit(__DATE__));
 
     connect(CActionManager::instance(), SIGNAL(actionUndone(int)), this, SLOT(onActionUndone(int)));
+
+    setFocusPolicy(Qt::StrongFocus);
+    qApp->installEventFilter( this );
 }
 
 
@@ -371,10 +374,8 @@ void CView::onButtonClicked()
 
     // Cas du bouton Valider
     if (name.compare("validate") == 0) {
-       if (!validate())
-       {
-            return;
-       }
+        validate();
+        return;
     }
     emit sendCommand(name);
 }
@@ -505,22 +506,6 @@ void CView::onOCRListChanged(QString patientName)
     ui->txtSurname->setText(list.at(1) );
 }
 
-void CView::keyPressEvent(QKeyEvent event)
-{
-    switch ( event->key() )
-    {
-    case Qt::Key_Enter:
-        validate();
-        break;
-    case Qt::Key_Tab:
-        //act on 'Y'
-        break;
-    default:
-        event->ignore();
-        break;
-    }
-}
-
 bool CView::validate()
 {
     if (checkFields()) {
@@ -529,6 +514,7 @@ bool CView::validate()
         if (!m_tableUsed) {
             m_fastsearch->appendNewPatient();
         }
+        sendCommand("validate");
         return true;
     }
     else {
@@ -536,5 +522,34 @@ bool CView::validate()
         return false;
     }
 }
+
+void CView::selectFirstFastSearch()
+{
+    QString str;
+    m_fastsearch->getCurrentItem(0, str);
+    ui->txtName->setText(str.section(',', 0, 0).trimmed());
+    ui->txtSurname->setText(str.section(",", 1, 1).trimmed());
+}
+
+bool CView::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+        if (key->key() == Qt::Key_Enter || key->key() == Qt::Key_Return) {
+            QWidgetList topWidgets = QApplication::topLevelWidgets();
+            if ( topWidgets.size() == 1 )
+            {
+                validate();
+                return true;
+            }
+        }
+        else if ( key->key() == Qt::Key_Tab )
+        {
+            selectFirstFastSearch();
+        }
+    }
+    return false;
+}
+
 
 

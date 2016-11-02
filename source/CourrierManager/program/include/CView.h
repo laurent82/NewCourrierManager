@@ -42,7 +42,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void keyPressEvent( QKeyEvent event);
+    bool eventFilter(QObject* obj, QEvent* event);
 
 public slots:
     void onInfoReceived(QString key, QVariant value);
@@ -120,6 +120,8 @@ private:
     void removeFromHistory (int id);
 
     bool validate();
+
+    void selectFirstFastSearch();
 
     QString m_lastDate; /// Dernière date enregistrée.
 

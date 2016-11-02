@@ -95,6 +95,15 @@ void CFastSearch::getItem(int i, QString& _rep){
     }
 }
 
+void CFastSearch::getCurrentItem(int i , QString& _rep)
+{
+    if (m_currentList->size() > 0){
+        if (i >= 0 && i < m_currentList->size()){
+            _rep = QString(m_currentList->at(i));
+        }
+    }
+}
+
 bool CFastSearch::isInList(QString _word){
     if (m_patientList->contains(_word,Qt::CaseInsensitive))
         return true;
@@ -143,4 +152,5 @@ void CFastSearch::appendNewPatient()
         file.close();
     }
 }
+
 
