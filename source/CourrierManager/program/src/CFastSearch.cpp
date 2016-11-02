@@ -22,12 +22,14 @@ CFastSearch::CFastSearch(bool _bDirectSearch)
         m_fullSorted = false;
 }
 
-CFastSearch::~CFastSearch(){
+CFastSearch::~CFastSearch()
+{
     delete m_patientList;
     delete m_currentList;
 }
 
-void CFastSearch::readPatientList(){
+void CFastSearch::readPatientList()
+{
     ifstream file("./patientlist.txt");
     if (file){
         string line;
@@ -49,12 +51,14 @@ void CFastSearch::readPatientList(){
     m_patientList->sort();
 }
 
-void CFastSearch::setWord(QString _word){
+void CFastSearch::setWord(QString _word)
+{
     m_word = _word;
     m_size = m_word.size();
 }
 
-int CFastSearch::computeScore(int i){
+int CFastSearch::computeScore(int i) const
+{
     int iScore = 0;
     const QString *currentWord = &m_patientList->at(i);
     int iMin = (m_size < currentWord->size())? m_size : currentWord->size();
@@ -69,11 +73,13 @@ int CFastSearch::computeScore(int i){
     return iScore;
 }
 
-QStringList* CFastSearch::getCurrentList() {
+QStringList* CFastSearch::getCurrentList() const 
+{
     return m_currentList;
 }
 
-QStringList* CFastSearch::getFullList() {
+QStringList* CFastSearch::getFullList() 
+{
     if (!m_fullSorted){
         m_patientList->sort();
         m_fullSorted = true;
@@ -82,7 +88,8 @@ QStringList* CFastSearch::getFullList() {
     return m_patientList;
 }
 
-void CFastSearch::getItem(int i, QString& _rep){
+void CFastSearch::getItem(int i, QString& _rep) const
+{
     if (m_currentList->size() > 0){
         if (i >= 0 && i < m_currentList->size()){
             _rep = QString(m_currentList->at(i));
@@ -95,7 +102,7 @@ void CFastSearch::getItem(int i, QString& _rep){
     }
 }
 
-void CFastSearch::getCurrentItem(int i , QString& _rep)
+void CFastSearch::getCurrentItem(int i , QString& _rep) const
 {
     if (m_currentList->size() > 0){
         if (i >= 0 && i < m_currentList->size()){
@@ -104,15 +111,9 @@ void CFastSearch::getCurrentItem(int i , QString& _rep)
     }
 }
 
-bool CFastSearch::isInList(QString _word){
-    if (m_patientList->contains(_word,Qt::CaseInsensitive))
-        return true;
-    else
-    {
-        m_patientList->append(_word);
-        m_fullSorted = false;
-        return false;
-    }
+bool CFastSearch::isInList(QString _word) const
+{
+    return m_patientList->contains(_word,Qt::CaseInsensitive) ;
 }
 
 void CFastSearch::run(){
@@ -132,7 +133,7 @@ void CFastSearch::run(){
     m_currentList->sort();
 }
 
-void CFastSearch::appendNewPatient()
+void CFastSearch::appendNewPatientInFile()
 {
     QString name = CPatient::instance()->getParameter("patient_name").toString().toUpper();
     name.append(", ");
@@ -141,6 +142,8 @@ void CFastSearch::appendNewPatient()
     name.append(surname);
     // Si le nom n'est pas encore dans la table, on l'enregistre.
     if (!isInList(name)) {
+        m_patientList->append(name);
+        m_fullSorted = false;
         name = CPatient::instance()->getParameter("patient_name").toString().toUpper();
         name.append(";");
         name.append(CPatient::instance()->getParameter("patient_surname").toString().toLower());

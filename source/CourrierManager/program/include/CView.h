@@ -80,12 +80,6 @@ signals:
 
 private:
     /**
-      * @brief Vide les champs et remets la date du jour.
-      * Ne touche pas aux informations dans CPatient.
-      */
-    void resetInfoPatient();
-
-    /**
       * Rempli les infos de CPatient avec les différents champs.
       */
     void fillPatient();
@@ -127,13 +121,11 @@ private:
 
     QStringListModel *m_modele;
     CFastSearch* m_fastsearch;
-    Ui::CourrierManagerClass *ui;
     CDrawPanelWidget* m_panel;
     QProgressDialog* m_progress;
     bool m_tableUsed;
-    bool m_Copying;
 
-
+    Ui::CourrierManagerClass *ui;
 };
 
 #endif // COURRIERMANAGER_H

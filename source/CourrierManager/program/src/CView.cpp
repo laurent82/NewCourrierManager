@@ -98,12 +98,91 @@ CView::~CView()
     delete m_modele;
 }
 
-void CView::resizeEvent(QResizeEvent* event){
-    int height = this->height() - 20;
-    int width =  (int)(height /1.41);
-    m_panel->setPanelSize(width,height);
-    ui->toolBar->move(width + 25, 100); //, 540,toolbarWidth);
-    ui->topButtons->move(width + 25, 15); // 540, 72);
+void CView::displayError(int errorId)
+{
+    switch (errorId)
+    {
+    case CError::NOCONFIGFILE:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Le fichier de configuration est introuvable.\nLe programme va se terminer."),
+            QMessageBox::Ok);
+        break;
+
+    case CError::UNKNOWNDIR:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Les répertoires sont incorrects. Utilisez l'option de configuration."),
+            QMessageBox::Ok);
+        break;
+
+    case CError::NOPATIENT:
+        QMessageBox::warning(this, tr("Courrier"),
+            tr("Aucun patient n'a été validé jusqu'à présent."),
+            QMessageBox::Ok);
+        break;
+    case CError::INVALIDDATE:
+        QMessageBox::warning(this, tr("Courrier"),
+            tr("Date invalide. Impossible de retrouver la date."),
+            QMessageBox::Ok);
+        break;
+    case CError::EMPTYFIELD:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Un champ est vide..."),
+            QMessageBox::Ok);
+        break;
+
+    case CError::RENAME:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Une erreur est survenue lors de la gestion de ce courrier. Le courrier a-t'il été recherché?"),
+            QMessageBox::Ok);
+        break;
+
+    case CError::NOMOREFILE:
+        m_panel->setImage(QImage()); // Efface l'image courante.
+        QMessageBox::information(this, tr("Courrier"),
+            tr("Il n'y a plus de courrier à classer."),
+            QMessageBox::Ok);
+        break;
+
+
+    case CError::DELETEFILE:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Erreur lors de la suppression du fichier."),
+            QMessageBox::Ok);
+        break;
+
+    case CError::ALLFILESSENT:
+        QMessageBox::information(this, tr("Courrier"),
+            tr("Tout le courrier a été envoyé."),
+            QMessageBox::Ok);
+        break;
+
+    case CError::NETWORKFILEEXISTS:
+        QMessageBox::warning(this, tr("Courrier"),
+            tr("Un fichier existait déjà sur le serveur et n'a pas été copié."),
+            QMessageBox::Ok);
+        break;
+    case CError::NETWORKPROBLEM:
+        if (m_progress)
+        {
+            m_progress->hide();
+            m_progress->deleteLater();
+            m_progress = nullptr;
+        }
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Une erreur s'est produite durant le transfert."),
+            QMessageBox::Ok);
+        break;
+    case CError::NOCONFIGUREDNETWORK:
+        QMessageBox::critical(this, tr("Courrier"),
+            tr("Le réseau n'a pas été configuré."),
+            QMessageBox::Ok);
+        break;
+    default:
+        QMessageBox::information(this, tr("Courrier"),
+            tr("Erreur non répertoriée."),
+            QMessageBox::Ok);
+        break;
+    }
 }
 
 void CView::setProgressBar(int total)
@@ -120,162 +199,8 @@ void CView::updateProgressBar(int step)
     }
 }
 
-void CView::onInfoReceived(QString key, QVariant value)
+void CView::setCurrentDate()
 {
-    if (key.compare("remainingImage") == 0) {
-        ui->lblRemaining->setText(QString("%1").arg(value.toInt()));
-        if (value.toInt() == 0) {
-            displayError(CError::NOMOREFILE);
-        } else {
-
-        }
-        
-        return;
-    }
-
-    if (key.compare("remainingPDF") == 0) {
-        ui->lblSent->setText(QString("%1").arg(value.toInt()));
-        ui->btnSend->setEnabled( (  ui->lblSent->text().toInt() != 0 ) );
-       return;
-    }
-
-    if (key.compare("image") == 0) {
-        m_panel->setImage(value.value<QImage>());
-        ui->ocrWidget->reset();
-        ui->ocrWidget->clear();
-        return;
-    }
-
-    if (key.compare("addToHistory") == 0) {
-        if (value.toBool() == true) {
-            QString fullName = CPatient::instance()->getParameter("patient_name").toString();
-            fullName.append(", ");
-            fullName.append(CPatient::instance()->getParameter("patient_surname").toString());
-            fullName.append(QString(" (%1)").arg(
-                                CPatient::instance()->getParameter("patient_page").toInt()));
-            QPushButton* cancel = new QPushButton("X");
-            cancel->setProperty("cancel", fullName);
-            cancel->setProperty("id", CAction::getLastActionId());
-            cancel->setMaximumWidth(30);
-            connect(cancel, SIGNAL(clicked()), this, SLOT(onHistoryCancel()));
-            ui->m_historyTable->insertRow(0);
-            ui->m_historyTable->setCellWidget(0, 0, cancel);
-            ui->m_historyTable->setItem(0, 1, new QTableWidgetItem(QString::number(CAction::getLastActionId())));
-            ui->m_historyTable->item(0,1)->setTextAlignment(Qt::AlignCenter);
-            ui->m_historyTable->setCellWidget(0, 2, new QLabel(fullName));
-            ui->m_historyTable->resizeColumnsToContents();
-
-        }
-
-        return;
-    }
-
-    if ( key.compare("ocr_list") == 0 )
-    {
-        ui->ocrWidget->reset();
-        ui->ocrWidget->clear();
-        ui->ocrWidget->addItems ( value.toStringList() );
-        return;
-    }
-
-    if ( key.compare("ocr_date") == 0 )
-    {
-        QString day, month, year;
-        QString full_date = value.toString();
-        CDate::extractDateFromOcr( full_date, day, month, year );
-        setCustomDate( day, month, year);
-        return;
-    }
-}
-
-void CView::displayError(int errorId)
-{
-    switch (errorId)
-    {
-    case CError::NOCONFIGFILE:
-    QMessageBox::critical(this, tr("Courrier"),
-                             tr("Le fichier de configuration est introuvable.\nLe programme va se terminer."),
-                             QMessageBox::Ok);
-    break;
-
-    case CError::UNKNOWNDIR:
-    QMessageBox::critical(this, tr("Courrier"),
-                             tr("Les répertoires sont incorrects. Utilisez l'option de configuration."),
-                             QMessageBox::Ok);
-    break;
-
-    case CError::NOPATIENT:
-    QMessageBox::warning(this, tr("Courrier"),
-                             tr("Aucun patient n'a été validé jusqu'à présent."),
-                             QMessageBox::Ok);
-    break;
-    case CError::INVALIDDATE:
-    QMessageBox::warning(this, tr("Courrier"),
-                             tr("Date invalide. Impossible de retrouver la date."),
-                             QMessageBox::Ok);
-    break;
-    case CError::EMPTYFIELD:
-    QMessageBox::critical(this, tr("Courrier"),
-                             tr("Un champ est vide..."),
-                             QMessageBox::Ok);
-    break;
-
-    case CError::RENAME:
-        QMessageBox::critical(this, tr("Courrier"),
-                              tr("Une erreur est survenue lors de la gestion de ce courrier. Le courrier a-t'il été recherché?"),
-                              QMessageBox::Ok);
-    break;
-
-    case CError::NOMOREFILE:
-        m_panel->setImage(QImage()); // Efface l'image courante.
-        QMessageBox::information(this, tr("Courrier"),
-                              tr("Il n'y a plus de courrier à classer."),
-                              QMessageBox::Ok);
-    break;
-
-
-    case CError::DELETEFILE:
-        QMessageBox::critical(this, tr("Courrier"),
-                              tr("Erreur lors de la suppression du fichier."),
-                              QMessageBox::Ok);
-    break;
-
-    case CError::ALLFILESSENT:
-        QMessageBox::information(this, tr("Courrier"),
-                              tr("Tout le courrier a été envoyé."),
-                              QMessageBox::Ok);
-    break;
-
-    case CError::NETWORKFILEEXISTS:
-        QMessageBox::warning( this, tr("Courrier"),
-                              tr("Un fichier existait déjà sur le serveur et n'a pas été copié."),
-                              QMessageBox::Ok);
-    break;
-    case CError::NETWORKPROBLEM:
-        if ( m_progress )
-        {
-            m_progress->hide();
-            m_progress->deleteLater();
-            m_progress = nullptr;
-        }
-        QMessageBox::critical(this, tr("Courrier"),
-                              tr("Une erreur s'est produite durant le transfert."),
-                              QMessageBox::Ok);
-    break;
-    case CError::NOCONFIGUREDNETWORK:
-        QMessageBox::critical(this, tr("Courrier"),
-            tr("Le réseau n'a pas été configuré."),
-            QMessageBox::Ok);
-        break;
-    default:
-        QMessageBox::information(this, tr("Courrier"),
-                              tr("Erreur non répertoriée."),
-                              QMessageBox::Ok);
-    break;
-    }
-}
-
-void CView::setCurrentDate(){
     QDate date = QDate::currentDate();
     ui->txtDay->setText(QString("%1").arg(date.day()));
     ui->txtMonth->setText(QString("%1").arg(date.month()));
@@ -288,17 +213,6 @@ void CView::setCustomDate(const QString& day, const QString& month, const QStrin
     ui->txtDay->setText( day );
     ui->txtMonth->setText( month );
     ui->txtYear->setText( year );
-}
-
-
-void CView::resetInfoPatient()
-{
-    ui->txtName->clear();
-    ui->txtSurname->clear();
-    // Date du jour
-    this->setCurrentDate();
-    ui->spPage->setValue(1);
-    m_tableUsed = false;
 }
 
 bool CView::checkFields()
@@ -327,12 +241,12 @@ void CView::removeFromHistory(int id)
     }
 }
 
-
 void CView::clearFields()
 {
     ui->txtName->setText("");
     ui->txtSurname->setText("");
     ui->spPage->setValue(1);
+    m_tableUsed = false;
     setCurrentDate();
 }
 
@@ -345,7 +259,6 @@ void CView::fillPatient()
     CPatient::instance()->configure("patient_table", m_tableUsed);
 
 }
-
 
 QString CView::constructDate()
 {
@@ -367,6 +280,59 @@ QString CView::constructDate()
     return date;
 }
 
+void CView::updateNetworkMethod()
+{
+    QSettings settings;
+    QString current_method = settings.value("network_method").toString();
+    if ( current_method.compare("server") == 0 )
+    {
+        ui->serverBar->setVisible( true );
+    }
+    else
+    {
+        ui->serverBar->setVisible( false );
+        ui->btnSend->setEnabled( false );
+    }
+}
+
+QStringList* CView::getPatientList() 
+{
+    return m_fastsearch->getFullList();
+}
+
+bool CView::validate()
+{
+    if (checkFields()) {
+        fillPatient();
+        clearFields();
+        if (!m_tableUsed) {
+            m_fastsearch->appendNewPatientInFile();
+        }
+        sendCommand("validate");
+        return true;
+    }
+    else {
+        displayError(CError::EMPTYFIELD);
+        return false;
+    }
+}
+
+void CView::selectFirstFastSearch()
+{
+    QString str;
+    m_fastsearch->getCurrentItem(0, str);
+    ui->txtName->setText(str.section(',', 0, 0).trimmed());
+    ui->txtSurname->setText(str.section(",", 1, 1).trimmed());
+    m_tableUsed = true;
+}
+
+
+// ---- SLOTS ----------------------------------------------------------------------
+
+void CView::onActionUndone(int id)
+{
+    removeFromHistory(id);
+}
 
 void CView::onButtonClicked()
 {
@@ -380,6 +346,22 @@ void CView::onButtonClicked()
     emit sendCommand(name);
 }
 
+void CView::onConnectedToHost()
+{
+    ui->btnSend->setEnabled(true);
+    ui->lblConnected->setStyleSheet("color: black;");
+    ui->lblConnected->setText("Connecté");
+    ui->btnConnect->setVisible(false);
+}
+
+void CView::onDisconnectedFromHost()
+{
+    ui->btnSend->setEnabled(false);
+    ui->lblConnected->setStyleSheet("color: red;");
+    ui->lblConnected->setText("Non connecté");
+    ui->btnConnect->setVisible(true);
+}
+
 void CView::onHistoryCancel()
 {
     int currentId = sender()->property("id").toInt();
@@ -391,7 +373,85 @@ void CView::onHistoryCancel()
     }
 }
 
-void CView::on_btnToday_clicked(){
+void CView::onInfoReceived(QString key, QVariant value)
+{
+    if (key.compare("remainingImage") == 0) {
+        ui->lblRemaining->setText(QString("%1").arg(value.toInt()));
+        if (value.toInt() == 0) {
+            displayError(CError::NOMOREFILE);
+        }
+        return;
+    }
+
+    if (key.compare("remainingPDF") == 0) {
+        ui->lblSent->setText(QString("%1").arg(value.toInt()));
+        ui->btnSend->setEnabled((ui->lblSent->text().toInt() != 0));
+        return;
+    }
+
+    if (key.compare("image") == 0) {
+        m_panel->setImage(value.value<QImage>());
+        ui->ocrWidget->reset();
+        ui->ocrWidget->clear();
+        return;
+    }
+
+    if (key.compare("addToHistory") == 0) {
+        if (value.toBool() == true) {
+            QString fullName = CPatient::instance()->getParameter("patient_name").toString();
+            fullName.append(", ");
+            fullName.append(CPatient::instance()->getParameter("patient_surname").toString());
+            fullName.append(QString(" (%1)").arg(
+                CPatient::instance()->getParameter("patient_page").toInt()));
+            QPushButton* cancel = new QPushButton("X");
+            cancel->setProperty("cancel", fullName);
+            cancel->setProperty("id", CAction::getLastActionId());
+            cancel->setMaximumWidth(30);
+            connect(cancel, SIGNAL(clicked()), this, SLOT(onHistoryCancel()));
+            ui->m_historyTable->insertRow(0);
+            ui->m_historyTable->setCellWidget(0, 0, cancel);
+            ui->m_historyTable->setItem(0, 1, new QTableWidgetItem(QString::number(CAction::getLastActionId())));
+            ui->m_historyTable->item(0, 1)->setTextAlignment(Qt::AlignCenter);
+            ui->m_historyTable->setCellWidget(0, 2, new QLabel(fullName));
+            ui->m_historyTable->resizeColumnsToContents();
+
+        }
+
+        return;
+    }
+
+    if (key.compare("ocr_list") == 0)
+    {
+        ui->ocrWidget->reset();
+        ui->ocrWidget->clear();
+        ui->ocrWidget->addItems(value.toStringList());
+        return;
+    }
+
+    if (key.compare("ocr_date") == 0)
+    {
+        QString day, month, year;
+        QString full_date = value.toString();
+        CDate::extractDateFromOcr(full_date, day, month, year);
+        setCustomDate(day, month, year);
+        return;
+    }
+}
+
+void CView::onOCRListChanged(QString patientName)
+{
+    QStringList list = patientName.split(", ");
+    ui->txtName->setText(list.at(0));
+    ui->txtSurname->setText(list.at(1));
+}
+
+void CView::onTableRefresh()
+{
+    m_modele->setStringList(*m_fastsearch->getCurrentList());
+}
+
+void CView::on_btnToday_clicked()
+{
     setCurrentDate();
 }
 
@@ -432,104 +492,32 @@ void CView::on_btnSamePatient_clicked()
     ui->spPage->setValue(page);
 }
 
-void CView::on_txtName_textEdited(QString _txt){
+void CView::on_txtName_textEdited(QString _txt)
+{
     if (ui->cbFastSearch->isChecked()){
         m_fastsearch->setWord(_txt.toUpper());
         m_fastsearch->start();
     }
-    CPatient::instance()->configure("patient_table", false);
+    m_tableUsed = false;
 }
 
-void CView::on_txtSurname_textEdited(QString _txt){
-    CPatient::instance()->configure("patient_table", false);
+void CView::on_txtSurname_textEdited(QString _txt)
+{
+    m_tableUsed = false;
 }
 
-void CView::on_tablePatient_clicked(){
+void CView::on_tablePatient_clicked()
+{
     int i = ui->tablePatient->currentIndex().row();
     QString str;
     m_fastsearch->getItem(i, str);
-    ui->txtName->setText(str.section(',',0,0).trimmed());
-    ui->txtSurname->setText(str.section(",", 1,1).trimmed());
-    CPatient::instance()->configure("patient_table", true);
-}
-
-void CView::onConnectedToHost()
-{
-    ui->btnSend->setEnabled(true);
-    ui->lblConnected->setStyleSheet("color: black;");
-    ui->lblConnected->setText("Connecté");
-    ui->btnConnect->setVisible(false);
-}
-
-void CView::onDisconnectedFromHost()
-{
-    ui->btnSend->setEnabled(false);
-    ui->lblConnected->setStyleSheet("color: red;");
-    ui->lblConnected->setText("Non connecté");
-    ui->btnConnect->setVisible(true);
-}
-
-void CView::onActionUndone(int id)
-{
-    removeFromHistory(id);
-}
-
-void CView::onTableRefresh()
-{
-    m_modele->setStringList(*m_fastsearch->getCurrentList());
-}
-
-void CView::updateNetworkMethod()
-{
-    QSettings settings;
-    QString current_method = settings.value("network_method").toString();
-    if ( current_method.compare("server") == 0 )
-    {
-        ui->serverBar->setVisible( true );
-    }
-    else
-    {
-        ui->serverBar->setVisible( false );
-        ui->btnSend->setEnabled( false );
-    }
-}
-
-QStringList* CView::getPatientList() 
-{
-    return m_fastsearch->getFullList();
-}
-
-void CView::onOCRListChanged(QString patientName)
-{
-    QStringList list = patientName.split(", ");
-    ui->txtName->setText( list.at(0) );
-    ui->txtSurname->setText(list.at(1) );
-}
-
-bool CView::validate()
-{
-    if (checkFields()) {
-        fillPatient();
-        clearFields();
-        if (!m_tableUsed) {
-            m_fastsearch->appendNewPatient();
-        }
-        sendCommand("validate");
-        return true;
-    }
-    else {
-        displayError(CError::EMPTYFIELD);
-        return false;
-    }
-}
-
-void CView::selectFirstFastSearch()
-{
-    QString str;
-    m_fastsearch->getCurrentItem(0, str);
     ui->txtName->setText(str.section(',', 0, 0).trimmed());
     ui->txtSurname->setText(str.section(",", 1, 1).trimmed());
+    m_tableUsed = true;
 }
+
+
+// ---- EVENTS ------------
 
 bool CView::eventFilter(QObject* obj, QEvent* event)
 {
@@ -537,13 +525,13 @@ bool CView::eventFilter(QObject* obj, QEvent* event)
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
         if (key->key() == Qt::Key_Enter || key->key() == Qt::Key_Return) {
             QWidgetList topWidgets = QApplication::topLevelWidgets();
-            if ( topWidgets.size() == 1 )
+            if (topWidgets.size() == 1)
             {
                 validate();
                 return true;
             }
         }
-        else if ( key->key() == Qt::Key_Tab )
+        else if (key->key() == Qt::Key_Tab)
         {
             selectFirstFastSearch();
         }
@@ -551,5 +539,11 @@ bool CView::eventFilter(QObject* obj, QEvent* event)
     return false;
 }
 
-
-
+void CView::resizeEvent(QResizeEvent* event)
+{
+    int height = this->height() - 20;
+    int width = (int)(height / 1.41);
+    m_panel->setPanelSize(width, height);
+    ui->toolBar->move(width + 25, 100); //, 540,toolbarWidth);
+    ui->topButtons->move(width + 25, 15); // 540, 72);
+}
